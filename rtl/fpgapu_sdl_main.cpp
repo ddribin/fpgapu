@@ -5,17 +5,19 @@
 
 float audio_time = 0;
 float freq = 440;
+static const int SAMPLE_FREQ = 11000;
 
 void callback(void* userdata, Uint8* stream, int len) {
-    short * snd = reinterpret_cast<short*>(stream);
+    uint8_t * snd = reinterpret_cast<uint8_t *>(stream);
     len /= sizeof(*snd);
-    for(int i = 0; i < len; i++) //Fill array with frequencies, mathy-math stuff
+    for( int i = 0; i < len; i++) //Fill array with frequencies, mathy-math stuff
     {
-        snd[i] = 32000 * sin(audio_time);
+        snd[i] = lround((50 * sin(audio_time)) + 127);
         
-        audio_time += freq * M_PI*2 / 48000.0;
-        if(audio_time >= M_PI*2)
+        audio_time += freq * M_PI*2 / double(SAMPLE_FREQ);
+        if (audio_time >= M_PI*2) {
             audio_time -= M_PI*2;
+        }
     }
 }
 
@@ -46,19 +48,27 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_AUDIO);
     SDL_AudioSpec spec, aspec; // the specs of our piece of "music"
     SDL_zero(spec);
-    spec.freq = 48000; //declare specs
-    spec.format = AUDIO_S16SYS;
+    spec.freq = SAMPLE_FREQ; //declare specs
+    spec.format = AUDIO_U8;
     spec.channels = 1;
     spec.samples = 4096;
     spec.callback = callback;
     spec.userdata = NULL;
 
       //Open audio, if error, print
-    int id;
+    SDL_AudioDeviceID id;
     if ((id = SDL_OpenAudioDevice(nullptr, 0, &spec, &aspec, SDL_AUDIO_ALLOW_ANY_CHANGE)) <= 0 )
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't open audio: %s\n", SDL_GetError());
         return 1;
+    }
+
+    if (spec.freq != aspec.freq) {
+        SDL_Log("We didn't get sample frequency");
+    }
+
+    if (spec.format != aspec.format) {
+        SDL_Log("We didn't get audio format");
     }
 
     freq = 440;
