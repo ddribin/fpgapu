@@ -1,0 +1,3 @@
+[submodule "verilatest"]
+	path = verilatest
+	url = https://github.com/ddribin/verilatest.git
