@@ -8,6 +8,10 @@ verilate(${LIB_TARGET_NAME} SOURCES pwm_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES pwm_top.v)
 verilate(${LIB_TARGET_NAME} SOURCES timing_strobe_generator.v)
 
+add_executable(fpgapu fpgapu_sdl_main.cpp)
+verilate(fpgapu SOURCES fpgapu_sdl_top.v)
+target_link_libraries(fpgapu PRIVATE SDL2::Main)
+
 include(Catch)
 
 set(TEST_TARGET_NAME ${BASE_NAME}_tests)
