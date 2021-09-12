@@ -3,8 +3,9 @@
 #include <verilated.h>
 #include "Vfpgapu_sdl_top.h"
 
-float audio_time = 0;
-float freq = 440;
+using TopModule = Vfpgapu_sdl_top;
+
+static TopModule * top = 0;
 static const int SAMPLE_FREQ = 11000;
 
 void callback(void* userdata, Uint8* stream, int len) {
@@ -12,12 +13,13 @@ void callback(void* userdata, Uint8* stream, int len) {
     len /= sizeof(*snd);
     for( int i = 0; i < len; i++) //Fill array with frequencies, mathy-math stuff
     {
-        snd[i] = lround((50 * sin(audio_time)) + 127);
-        
-        audio_time += freq * M_PI*2 / double(SAMPLE_FREQ);
-        if (audio_time >= M_PI*2) {
-            audio_time -= M_PI*2;
-        }
+        top->i_clk = 1;
+        top->eval();
+        top->i_clk = 0;
+        top->eval();
+
+        snd[i] = top->o_audio_sample;
+        printf("snd[%d] = %d\n", i, snd[i]);
     }
 }
 
@@ -71,10 +73,14 @@ int main(int argc, char* argv[])
         SDL_Log("We didn't get audio format");
     }
 
-    freq = 440;
-
     /* Start playing, "unpause" */
     SDL_PauseAudioDevice(id, 0);
+
+    top = new TopModule();
+    fprintf(stderr, "PWD: %s\n", getcwd(NULL, 0));
+
+    top->i_clk = 0;
+    top->eval();
 
     bool running = true;
     while (running) {
@@ -82,7 +88,8 @@ int main(int argc, char* argv[])
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT) {
-                return running = false;
+                SDL_PauseAudioDevice(id, 1);
+                running = false;
             }
         }
 
