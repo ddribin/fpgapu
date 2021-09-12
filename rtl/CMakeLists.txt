@@ -1,4 +1,4 @@
-set(BASE_NAME pwm)
+set(BASE_NAME fpgapu)
 
 set(LIB_TARGET_NAME ${BASE_NAME}_lib)
 add_library(${LIB_TARGET_NAME} STATIC)
