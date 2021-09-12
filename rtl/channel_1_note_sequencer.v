@@ -160,11 +160,15 @@ module channel_1_note_sequencer (
   reg [31:0] r_vibrato_depth_2 = 0;
   always @(*) begin
     case (r_vibrato_depth)
-      3'd01: begin r_vibrato_depth_1 = 32'h79E; r_vibrato_depth_2 = 32'hB1F; end
-      3'd02: begin r_vibrato_depth_1 = 32'h1449; r_vibrato_depth_2 = 32'h1DE5; end
-      3'd03: begin r_vibrato_depth_1 = 32'h2324; r_vibrato_depth_2 = 32'h401C; end
-      3'd04: begin r_vibrato_depth_1 = 32'h3c26; r_vibrato_depth_2 = 32'h5a68; end
+      // 3'd01: begin r_vibrato_depth_1 = 32'h79E; r_vibrato_depth_2 = 32'hB1F; end
+      // 3'd02: begin r_vibrato_depth_1 = 32'h1449; r_vibrato_depth_2 = 32'h1DE5; end
+      // 3'd03: begin r_vibrato_depth_1 = 32'h2324; r_vibrato_depth_2 = 32'h401C; end
+      // 3'd04: begin r_vibrato_depth_1 = 32'h3c26; r_vibrato_depth_2 = 32'h5a68; end
 
+      3'd01: begin r_vibrato_depth_1 = 32'h131495; r_vibrato_depth_2 = 32'h1A240C; end
+      3'd02: begin r_vibrato_depth_1 = 32'h331E94; r_vibrato_depth_2 = 32'h465C56; end
+      3'd03: begin r_vibrato_depth_1 = 32'h576809; r_vibrato_depth_2 = 32'h872421; end
+      3'd04: begin r_vibrato_depth_1 = 32'h5A8292; r_vibrato_depth_2 = 32'h91ED24; end
       default: begin r_vibrato_depth_1 = 0; r_vibrato_depth_2 = 0; end
     endcase
   end

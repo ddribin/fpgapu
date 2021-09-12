@@ -6,7 +6,7 @@
 using TopModule = Vfpgapu_sdl_top;
 
 static TopModule * top = 0;
-static const int SAMPLE_FREQ = 11000;
+static const int SAMPLE_FREQ = 48000;
 
 void callback(void* userdata, Uint8* stream, int len) {
     uint8_t * snd = reinterpret_cast<uint8_t *>(stream);
@@ -19,7 +19,6 @@ void callback(void* userdata, Uint8* stream, int len) {
         top->eval();
 
         snd[i] = top->o_audio_sample;
-        printf("snd[%d] = %d\n", i, snd[i]);
     }
 }
 

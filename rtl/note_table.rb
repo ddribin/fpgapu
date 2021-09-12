@@ -51,7 +51,7 @@ NOTES = [
   [],
   ["C8",  4186.009],
 ]
-SAMPLE_HZ = 25_000_000
+SAMPLE_HZ = 48_000
 BPM = 180
 
 COMMAND = File.basename($0)
@@ -94,7 +94,7 @@ def print_note_table
 
     name = note[0]
     freq_hz = note[1]
-    count = freq_to_count(count)
+    count = freq_to_count(freq_hz)
     printf "%08X  // %-3s %11.5f Hz\n", count, name, freq_hz
     i += 1
   end
