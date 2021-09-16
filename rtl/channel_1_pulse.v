@@ -1,7 +1,8 @@
 `default_nettype none
 
 module channel_1_pulse  #(
-  parameter NOTE_TABLE_FILE = ""
+  parameter NOTE_TABLE_FILE = "",
+  parameter VIBRATO_TABLE_FILE = ""
 ) (
   input wire          i_clk,
   input wire          i_tick_stb,
@@ -16,7 +17,8 @@ module channel_1_pulse  #(
   wire          w_compare_valid = 1;
   wire [8:0]    w_envelope;
   channel_1_note_sequencer #(
-    .NOTE_TABLE_FILE(NOTE_TABLE_FILE)
+    .NOTE_TABLE_FILE(NOTE_TABLE_FILE),
+    .VIBRATO_TABLE_FILE(VIBRATO_TABLE_FILE)
   ) sequencer (
     .i_clk(i_clk),
     .i_tick_stb(i_tick_stb),

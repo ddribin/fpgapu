@@ -13,12 +13,12 @@ add_executable(${SDL_TARGET_NAME} fpgapu_sdl_main.cpp)
 verilate(${SDL_TARGET_NAME} SOURCES fpgapu_sdl_top.v)
 target_link_libraries(${SDL_TARGET_NAME} PRIVATE SDL2::Main)
 
-add_custom_target(${SDL_TARGET_NAME}-resources ALL
+add_custom_target(${SDL_TARGET_NAME}-resources
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/resources
     ${CMAKE_CURRENT_BINARY_DIR}/resources
-    DEPENDS ${SDL_TARGET_NAME}
 )
+add_dependencies(${SDL_TARGET_NAME} ${SDL_TARGET_NAME}-resources)
 
 include(Catch)
 

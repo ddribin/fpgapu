@@ -2,7 +2,8 @@
 
 module audio_processing_unit #(
   parameter CLOCK_FREQ = 0,
-  parameter NOTE_TABLE_FILE = ""
+  parameter NOTE_TABLE_FILE = "",
+  parameter VIBRATO_TABLE_FILE = ""
 ) (
   input wire          i_clk,
   input wire  [3:0]   i_mixer,
@@ -23,7 +24,8 @@ module audio_processing_unit #(
   wire [8:0] w_compare_pulse_1;
   wire w_frame_pulse_1;
   channel_1_pulse #(
-    .NOTE_TABLE_FILE(NOTE_TABLE_FILE)
+    .NOTE_TABLE_FILE(NOTE_TABLE_FILE),
+    .VIBRATO_TABLE_FILE(VIBRATO_TABLE_FILE)
   ) pulse_1 (
     .i_clk(i_clk),
     .i_tick_stb(w_tick_stb),

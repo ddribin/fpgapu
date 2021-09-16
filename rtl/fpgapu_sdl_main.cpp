@@ -72,14 +72,18 @@ int main(int argc, char* argv[])
         SDL_Log("We didn't get audio format");
     }
 
-    /* Start playing, "unpause" */
-    SDL_PauseAudioDevice(id, 0);
-
-    top = new TopModule();
     fprintf(stderr, "PWD: %s\n", getcwd(NULL, 0));
 
+    // top is accessed in the audio callback, which is a separate thread, so need to lock it.
+    // Probably not needed since the device is still paused, but this ensures proper memory barriers.
+    SDL_LockAudioDevice(id);
+    top = new TopModule();
     top->i_clk = 0;
     top->eval();
+    SDL_UnlockAudioDevice(id);
+
+    /* Start playing, "unpause" */
+    SDL_PauseAudioDevice(id, 0);
 
     bool running = true;
     while (running) {
