@@ -1,7 +1,9 @@
 `default_nettype none
 `include "note_table.vh"
 
-module channel_3_note_sequencer (
+module channel_3_note_sequencer #(
+  parameter NOTE_TABLE_FILE = ""
+) (
   input wire          i_clk,
   input wire          i_tick_stb,
   input wire          i_note_stb,
@@ -64,6 +66,7 @@ module channel_3_note_sequencer (
 
   assign o_top = 8'hff;
   assign o_top_valid = 1;
-  note_table note_table(.i_note(r_note), .o_compare(o_phase_delta));
+  note_table #(.FILE(NOTE_TABLE_FILE)) note_table
+    (.i_note(r_note), .o_compare(o_phase_delta));
 
 endmodule

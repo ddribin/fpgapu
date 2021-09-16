@@ -1,6 +1,8 @@
 `default_nettype none
 
-module channel_3_triangle (
+module channel_3_triangle #(
+  parameter NOTE_TABLE_FILE = ""
+) (
   input wire          i_clk,
   input wire          i_tick_stb,
   input wire          i_note_stb,
@@ -12,7 +14,9 @@ module channel_3_triangle (
   wire          w_top_valid;
   wire [31:0]   w_phase_delta;
   wire          w_compare_valid = 1;
-  channel_3_note_sequencer sequencer(
+  channel_3_note_sequencer #(
+    .NOTE_TABLE_FILE(NOTE_TABLE_FILE)
+  ) sequencer (
     .i_clk(i_clk),
     .i_tick_stb(i_tick_stb),
     .i_note_stb(i_note_stb),

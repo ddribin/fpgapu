@@ -1,6 +1,8 @@
 `default_nettype none
 
-module channel_2_pulse (
+module channel_2_pulse #(
+  parameter NOTE_TABLE_FILE = ""
+) (
   input wire          i_clk,
   input wire          i_tick_stb,
   input wire          i_note_stb,
@@ -13,7 +15,9 @@ module channel_2_pulse (
   wire [31:0]   w_phase_delta;
   wire          w_compare_valid = 1;
   wire [8:0]    w_envelope;
-  channel_2_note_sequencer sequencer(
+  channel_2_note_sequencer #(
+    .NOTE_TABLE_FILE(NOTE_TABLE_FILE)
+  ) sequencer (
     .i_clk(i_clk),
     .i_tick_stb(i_tick_stb),
     .i_note_stb(i_note_stb),
