@@ -60,7 +60,8 @@ module pwm_top (
   wire [8:0] w_compare_pulse_1;
   wire w_frame_pulse;
   channel_1_pulse #(
-    .NOTE_TABLE_FILE("resources/note_table_25MHz.txt")
+    .NOTE_TABLE_FILE("resources/note_table_25MHz.txt"),
+    .VIBRATO_TABLE_FILE("resources/vibrato_table_25MHz.txt")
   ) pulse_1 (
     .i_clk(i_Clk),
     .i_tick_stb(w_tick_stb),
