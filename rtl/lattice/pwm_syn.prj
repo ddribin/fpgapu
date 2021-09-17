@@ -16,6 +16,8 @@ add_file -verilog -lib work "../channel_1_note_sequencer.v"
 add_file -verilog -lib work "../channel_2_note_sequencer.v" 
 add_file -verilog -lib work "../timing_strobe_generator.v" 
 add_file -verilog -lib work "../rom_async.v" 
+add_file -verilog -lib work "../audio_processing_unit.v" 
+add_file -verilog -lib work "../go_board_switches.v" 
 #implementation: "pwm_Implmnt"
 impl -add pwm_Implmnt -type fpga
 
