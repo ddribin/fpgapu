@@ -14,11 +14,11 @@ module pwm_top (
 );
   wire i_clk = i_Clk;
 
-  wire [3:0] w_swithes;
-  go_board_switches switches (
+  wire [3:0] w_switches;
+  switch_synchronizers switches (
     .i_clk(i_clk),
     .i_switches({i_Switch_4, i_Switch_3, i_Switch_2, i_Switch_1}),
-    .o_switches(w_swithes)
+    .o_switches(w_switches)
   );
 
   wire [8:0] w_compare;
@@ -29,7 +29,7 @@ module pwm_top (
     .VIBRATO_TABLE_FILE("resources/vibrato_table_25MHz.txt")
   ) apu (
     .i_clk(i_clk),
-    .i_mixer(w_swithes),
+    .i_mixer(w_switches),
     .o_sample(w_compare),
     .o_frame_pulse(w_frame_pulse)
   );

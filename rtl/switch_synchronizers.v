@@ -1,6 +1,6 @@
 `default_nettype none
 
-module go_board_switches (
+module switch_synchronizers (
   input wire        i_clk,
   input wire  [3:0] i_switches,
   output wire [3:0] o_switches
