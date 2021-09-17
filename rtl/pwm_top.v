@@ -21,15 +21,16 @@ module pwm_top (
     .o_switches(w_switches)
   );
 
+  wire [3:0] w_mixer = ~w_switches;
   wire [8:0] w_compare;
   wire [3:0] w_frame_pulse;
   audio_processing_unit #(
-    .CLOCK_FREQ(48_000),
+    .CLOCK_FREQ(25_000_000),
     .NOTE_TABLE_FILE("resources/note_table_25MHz.txt"),
     .VIBRATO_TABLE_FILE("resources/vibrato_table_25MHz.txt")
   ) apu (
     .i_clk(i_clk),
-    .i_mixer(w_switches),
+    .i_mixer(w_mixer),
     .o_sample(w_compare),
     .o_frame_pulse(w_frame_pulse)
   );
