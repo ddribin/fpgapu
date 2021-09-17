@@ -160,29 +160,7 @@ module channel_1_note_sequencer #(
     endcase
   end
 
-  // reg [31:0] r_vibrato_table_hi[7:0];
-  // initial begin
-  //   // $display("Vibrato table file file '%s'.", VIBRATO_TABLE_FILE);
-  //   $readmemh("resources/vibrato_hi_48kHz.txt", r_vibrato_table_hi);
-  // end
-
-  // reg [63:0] t_vibrato_table[0:7];
-  // initial begin
-  //   t_vibrato_table[0] = 64'h0;
-  //   t_vibrato_table[1] = 64'h00131495_001a240c;
-  //   t_vibrato_table[2] = 64'h00331e94_00465c56;
-  //   t_vibrato_table[3] = 64'h00576809_00872421;
-  //   t_vibrato_table[4] = 64'h005a8292_0091ed24;
-
-  //   t_vibrato_table[5] = 64'h0;
-  //   t_vibrato_table[6] = 64'h0;
-  //   t_vibrato_table[7] = 64'h0;
-  // end
   wire [63:0] r_vibrato_depths;
-  // always @(posedge i_clk) begin
-  //   r_vibrato_depths <= t_vibrato_table[r_vibrato_depth];
-  // end
-  // t_vibrato_table[r_vibrato_depth];
   rom_async #(
     .WIDTH(64),
     .DEPTH(8),
@@ -192,49 +170,8 @@ module channel_1_note_sequencer #(
     .data(r_vibrato_depths)
   );
 
-  // reg [63:0] r_vibrato_depths = '0;
   wire [31:0] r_vibrato_depth_1 = r_vibrato_depths[63:32];
   wire [31:0] r_vibrato_depth_2 = r_vibrato_depths[31:0];
-  // reg [31:0] r_vibrato_depth_1 = '0;
-  // reg [31:0] r_vibrato_depth_2 = '0;
-  always @(posedge i_clk) begin
-    // r_vibrato_depth_1 <= r_vibrato_depths[63:32];
-    // r_vibrato_depth_2 <= r_vibrato_depths[31:0];
-  end
-  // always @(*) begin
-  //   r_vibrato_depth_1 = 32'h0;
-  //   r_vibrato_depth_2 = 32'h0;
-  // end
-
-  // always @(*) begin
-  //   case (r_vibrato_depth)
-  //     // 3'd01: begin r_vibrato_depth_1 = 32'h79E; r_vibrato_depth_2 = 32'hB1F; end
-  //     // 3'd02: begin r_vibrato_depth_1 = 32'h1449; r_vibrato_depth_2 = 32'h1DE5; end
-  //     // 3'd03: begin r_vibrato_depth_1 = 32'h2324; r_vibrato_depth_2 = 32'h401C; end
-  //     // 3'd04: begin r_vibrato_depth_1 = 32'h3c26; r_vibrato_depth_2 = 32'h5a68; end
-
-  //     3'd01: begin r_vibrato_depths = 64'h00131495_001a240c; end
-  //     3'd02: begin r_vibrato_depths = 64'h00331e94_00465c56; end
-  //     3'd03: begin r_vibrato_depths = 64'h00576809_00872421; end
-  //     3'd04: begin r_vibrato_depths = 64'h005a8292_0091ed24; end
-  //     default: begin r_vibrato_depths = 64'h0; end
-  //   endcase
-  // end
-
-  // always @(*) begin
-  //   case (r_vibrato_depth)
-  //     // 3'd01: begin r_vibrato_depth_1 = 32'h79E; r_vibrato_depth_2 = 32'hB1F; end
-  //     // 3'd02: begin r_vibrato_depth_1 = 32'h1449; r_vibrato_depth_2 = 32'h1DE5; end
-  //     // 3'd03: begin r_vibrato_depth_1 = 32'h2324; r_vibrato_depth_2 = 32'h401C; end
-  //     // 3'd04: begin r_vibrato_depth_1 = 32'h3c26; r_vibrato_depth_2 = 32'h5a68; end
-
-  //     3'd01: begin r_vibrato_depth_1 = 32'h131495; r_vibrato_depth_2 = 32'h1A240C; end
-  //     3'd02: begin r_vibrato_depth_1 = 32'h331E94; r_vibrato_depth_2 = 32'h465C56; end
-  //     3'd03: begin r_vibrato_depth_1 = 32'h576809; r_vibrato_depth_2 = 32'h872421; end
-  //     3'd04: begin r_vibrato_depth_1 = 32'h5A8292; r_vibrato_depth_2 = 32'h91ED24; end
-  //     default: begin r_vibrato_depth_1 = 0; r_vibrato_depth_2 = 0; end
-  //   endcase
-  // end
 
   reg [2:0] r_vibrato_adjust_index = 0;
   always @(posedge i_clk) begin
@@ -251,9 +188,6 @@ module channel_1_note_sequencer #(
 
   reg [31:0] r_vibrato_adjust = 0;
   always @(posedge i_clk) begin
-    // r_vibrato_depth_1 <= r_vibrato_depths[63:32];
-    // r_vibrato_depth_2 <= r_vibrato_depths[31:0];
-
     case (r_vibrato_adjust_index)
       3'd00: r_vibrato_adjust <= 0;
       3'd01: r_vibrato_adjust <= -r_vibrato_depth_1;
