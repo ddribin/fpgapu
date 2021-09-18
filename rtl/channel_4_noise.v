@@ -18,9 +18,20 @@ module channel_4_noise #(
   wire [31:0]   w_phase_delta = 'h001CD5FA;
   wire [31:0]   w_phase;
   wire          w_phase_strobe;
+  reg   [31:0]  r_phase_delta = 0;
+  always @(posedge i_clk) begin
+    if (r_phase_delta == 0) begin
+      r_phase_delta <= 'h001CD5FA;
+    end else if (r_phase_delta >= 'h0134AB02) begin
+      r_phase_delta <= 'h001CD5FA;
+    end else begin
+      r_phase_delta <= r_phase_delta + 'h08;
+    end
+  end
+
   phase_generator phase_generator (
     .i_clk(i_clk),
-    .i_phase_delta(w_phase_delta),
+    .i_phase_delta(r_phase_delta),
     .i_phase_delta_valid(1'b1),
     .o_phase(w_phase),
     .o_phase_strobe(w_phase_strobe)
@@ -32,6 +43,6 @@ module channel_4_noise #(
     end
   end
 
-  assign o_output = r_shift_register[0]? 9'h10 : 9'h00;
+  assign o_output = r_shift_register[0]? 9'h0B : 9'h00;
 
 endmodule
