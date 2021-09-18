@@ -60,6 +60,6 @@ module channel_4_noise #(
     end
   end
 
-  assign o_output = r_shift_register[0]? 9'h0B : 9'h00;
+  assign o_output = r_shift_register[0]? w_envelope : 9'h00;
 
 endmodule

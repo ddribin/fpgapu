@@ -27,7 +27,7 @@ module channel_4_note_sequencer #(
         r_duration_count <= 0;
         r_note_index <= r_note_index + 1;
         if (r_note_index == 5'd23) begin
-          r_note_index <= 0;
+          r_note_index <= '0;
         end
       end else begin
         r_duration_count <= r_duration_count + 1;
@@ -83,42 +83,37 @@ module channel_4_note_sequencer #(
   end
   assign o_phase_delta = r_phase_delta;
 
-  // reg [18:0] r_envelope_counter = 0;
-  // reg [3:0] r_envelope_index = 0;
-  // always @(posedge i_clk) begin
-  //   if (r_new_note) begin
-  //     r_envelope_index <= 0;
-  //   end else if (i_tick_stb) begin
-  //     if (r_envelope_index == 4'd8) begin
-  //       r_envelope_index <= 4'd8;
-  //     end else begin
-  //       r_envelope_index <= r_envelope_index + 1;
-  //     end
-  //   end
-  // end
+  reg [3:0] r_envelope_index = 0;
+  always @(posedge i_clk) begin
+    if (r_new_note) begin
+      r_envelope_index <= 0;
+    end else if (i_tick_stb) begin
+      if (r_envelope_index == 4'd9) begin
+        r_envelope_index <= 4'd9;
+      end else begin
+        r_envelope_index <= r_envelope_index + 1;
+      end
+    end
+  end
 
-  // reg [8:0] r_envelope = 0;
-  // always @(*) begin
-  //   case (r_envelope_index)
-  //     4'd00: r_envelope = 7*2;
-  //     4'd01: r_envelope = 7*2;
-  //     4'd02: r_envelope = 7*2;
-  //     4'd03: r_envelope = 7*2;
-  //     4'd04: r_envelope = 7*2;
-  //     4'd05: r_envelope = 7*2;
-  //     4'd06: r_envelope = 7*2;
-  //     4'd07: r_envelope = 1*2;
-  //     4'd08: r_envelope = 0;
+  reg [8:0] r_envelope = 0;
+  always @(*) begin
+    case (r_envelope_index)
+      4'd00: r_envelope = 'd10*2;
+      4'd01: r_envelope = 'd10*2;
+      4'd02: r_envelope = 'd10*2;
+      4'd03: r_envelope = 'd6*2;
+      4'd04: r_envelope = 'd6*2;
+      4'd05: r_envelope = 'd6*2;
+      4'd06: r_envelope = 'd4*2;
+      4'd07: r_envelope = 'd4*2;
+      4'd08: r_envelope = 'd2*2;
+      4'd09: r_envelope = 'd0;
 
-  //     default: r_envelope = 0;
-  //   endcase
-  // end
+      default: r_envelope = 0;
+    endcase
+  end
 
-  // assign o_top = 8'hff;
-  // assign o_top_valid = 1;
-  // note_table #(.FILE(NOTE_TABLE_FILE)) note_table
-  //   (.i_note(r_note), .o_compare(o_phase_delta));
-  // assign o_envelope = r_envelope;
-  assign o_envelope = 'h0b;
+  assign o_envelope = r_envelope;
 
 endmodule
