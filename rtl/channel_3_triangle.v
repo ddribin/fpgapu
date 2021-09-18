@@ -26,11 +26,12 @@ module channel_3_triangle #(
   );
 
   wire [31:0] w_phase;
-  phase_generator phase_generator(
+  phase_generator phase_generator (
     .i_clk(i_clk),
     .i_phase_delta(w_phase_delta),
     .i_phase_delta_valid(1'b1),
-    .o_phase(w_phase)
+    .o_phase(w_phase),
+    .o_phase_strobe()
   );
 
   // Generate a triangle wave

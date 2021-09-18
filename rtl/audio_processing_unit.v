@@ -58,11 +58,23 @@ module audio_processing_unit #(
     .o_frame_pulse(w_frame_pulse_3)
   );
 
+  wire [8:0] w_noise_output;
+  wire w_frame_pulse_4;
+  channel_4_noise #(
+  ) noise (
+    .i_clk(i_clk),
+    .i_tick_stb(w_tick_stb),
+    .i_note_stb(w_beat_stb),
+    .o_output(w_noise_output),
+    .o_frame_pulse(w_frame_pulse_4)
+  );
+
   // Mixer
   assign o_sample =
     (i_mixer[0]? w_compare_pulse_1 : 9'd0) +
     (i_mixer[1]? w_compare_pulse_2 : 9'd0) +
-    (i_mixer[2]? w_triangle_3_output : 9'd0);
+    (i_mixer[2]? w_triangle_3_output : 9'd0) +
+    (i_mixer[3]? w_noise_output : 9'd0);
   
-  assign o_frame_pulse = {1'b0, w_frame_pulse_3, w_frame_pulse_2, w_frame_pulse_1};
+  assign o_frame_pulse = {w_frame_pulse_4, w_frame_pulse_3, w_frame_pulse_2, w_frame_pulse_1};
 endmodule
