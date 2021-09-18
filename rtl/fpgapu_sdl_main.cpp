@@ -6,18 +6,41 @@
 using TopModule = Vfpgapu_sdl_top;
 
 static TopModule * top = 0;
-static const int SAMPLE_FREQ = 48000;
+static const uint64_t SAMPLE_FREQ = 441000;  // 44.1 kHz
+static const uint64_t CLOCK_FREQ = 1000000;  // 1 MHz
+static const uint8_t  COUNTER_WIDTH = 32;
+static const uint64_t COUNTER_MASK = (1ULL << COUNTER_WIDTH) - 1;
+
+static uint64_t counter;
+static uint64_t callback_delta = 0;
+
+void run_one_tick(void)
+{
+    top->i_clk = 1;
+    top->eval();
+    top->i_clk = 0;
+    top->eval();
+}
+
+void run_until_wrap(void)
+{
+    while (1) {
+        run_one_tick();
+
+        counter += callback_delta;
+        bool wrap = (counter >> COUNTER_WIDTH) != 0;
+        counter &= COUNTER_MASK;
+        if (wrap) {
+            break;
+        }
+    }
+}
 
 void callback(void* userdata, Uint8* stream, int len) {
     uint8_t * snd = reinterpret_cast<uint8_t *>(stream);
     len /= sizeof(*snd);
-    for( int i = 0; i < len; i++) //Fill array with frequencies, mathy-math stuff
-    {
-        top->i_clk = 1;
-        top->eval();
-        top->i_clk = 0;
-        top->eval();
-
+    for( int i = 0; i < len; i++) {
+        run_until_wrap();
         snd[i] = top->o_audio_sample;
     }
 }
@@ -74,12 +97,17 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "PWD: %s\n", getcwd(NULL, 0));
 
-    // top is accessed in the audio callback, which is a separate thread, so need to lock it.
+	double delta = SAMPLE_FREQ * pow(2, COUNTER_WIDTH)/CLOCK_FREQ;
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Callback delta: %f", delta);
+
+    // These are accessed in the audio callback, which is a separate thread, so need to lock it.
     // Probably not needed since the device is still paused, but this ensures proper memory barriers.
     SDL_LockAudioDevice(id);
     top = new TopModule();
     top->i_clk = 0;
     top->eval();
+
+    callback_delta = roundl(delta);
     SDL_UnlockAudioDevice(id);
 
     /* Start playing, "unpause" */

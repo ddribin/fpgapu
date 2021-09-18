@@ -51,7 +51,7 @@ NOTES = [
   [],
   ["C8",  4186.009],
 ]
-SAMPLE_HZ = 48_000
+SAMPLE_HZ = 1_000_000
 BPM = 180
 
 COMMAND = File.basename($0)

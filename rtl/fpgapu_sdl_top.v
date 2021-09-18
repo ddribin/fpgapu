@@ -7,9 +7,9 @@ module fpgapu_sdl_top (
 
   wire [8:0] w_audio_sample;
   audio_processing_unit #(
-    .CLOCK_FREQ(48_000),
-    .NOTE_TABLE_FILE("resources/note_table_48kHz.txt"),
-    .VIBRATO_TABLE_FILE("resources/vibrato_table_48kHz.txt")
+    .CLOCK_FREQ(1_000_000),
+    .NOTE_TABLE_FILE("resources/note_table_1MHz.txt"),
+    .VIBRATO_TABLE_FILE("resources/vibrato_table_1MHz.txt")
   ) apu (
     .i_clk(i_clk),
     .i_mixer(4'b1111),
