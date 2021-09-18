@@ -2,6 +2,7 @@
 
 module fpgapu_sdl_top (
   input wire        i_clk,
+  input wire  [3:0] i_mixer,
   output wire [7:0] o_audio_sample
 );
 
@@ -12,7 +13,7 @@ module fpgapu_sdl_top (
     .VIBRATO_TABLE_FILE("resources/vibrato_table_1MHz.txt")
   ) apu (
     .i_clk(i_clk),
-    .i_mixer(4'b1111),
+    .i_mixer(i_mixer),
     .o_sample(w_audio_sample),
     .o_frame_pulse()
   );

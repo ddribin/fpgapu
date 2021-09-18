@@ -100,11 +100,17 @@ int main(int argc, char* argv[])
 	double delta = SAMPLE_FREQ * pow(2, COUNTER_WIDTH)/CLOCK_FREQ;
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Callback delta: %f", delta);
 
+    bool mute_1 = false;
+    bool mute_2 = false;
+    bool mute_3 = false;
+    bool mute_4 = false;
+
     // These are accessed in the audio callback, which is a separate thread, so need to lock it.
     // Probably not needed since the device is still paused, but this ensures proper memory barriers.
     SDL_LockAudioDevice(id);
     top = new TopModule();
     top->i_clk = 0;
+    top->i_mixer = 0b1111;
     top->eval();
 
     callback_delta = roundl(delta);
@@ -115,13 +121,47 @@ int main(int argc, char* argv[])
 
     bool running = true;
     while (running) {
+        uint8_t mixer =
+            ((mute_4? 0 : 1 << 3) |
+             (mute_3? 0 : 1 << 2) |
+             (mute_2? 0 : 1 << 1) |
+             (mute_1? 0 : 1 << 0));
+        
+        SDL_LockAudioDevice(id);
+        top->i_mixer = mixer;
+        SDL_UnlockAudioDevice(id);
+
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT) {
                 SDL_PauseAudioDevice(id, 1);
                 running = false;
+            } else if (e.type == SDL_KEYDOWN) {
+				int key = e.key.keysym.sym;
+				switch (key) {
+                    case SDLK_1:
+                        mute_1 = !mute_1;
+                        break;
+
+                    case SDLK_2:
+                        mute_2 = !mute_2;
+                        break;
+
+                    case SDLK_3:
+                        mute_3 = !mute_3;
+                        break;
+
+                    case SDLK_4:
+                        mute_4 = !mute_4;
+                        break;
+
+                    default:
+                        break;
+                }
+
             }
+
         }
 
         SDL_RenderClear(renderer);
