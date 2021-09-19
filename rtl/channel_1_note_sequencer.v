@@ -6,6 +6,7 @@ module channel_1_note_sequencer #(
   parameter VIBRATO_TABLE_FILE = ""
 ) (
   input wire          i_clk,
+  input wire          i_rst,
   input wire          i_tick_stb,
   input wire          i_note_stb,
 
@@ -25,7 +26,10 @@ module channel_1_note_sequencer #(
   // reg      r_new_note = 0;
 
   always @(posedge i_clk) begin
-    if (i_note_stb) begin
+    if (i_rst) begin
+      r_note_index <= 0;
+      r_duration_count <= 0;
+    end else if (i_note_stb) begin
       if (r_duration_count == r_note_len) begin
         r_duration_count <= 0;
         r_note_index <= r_note_index + 1;
@@ -69,10 +73,11 @@ module channel_1_note_sequencer #(
     endcase
   end
 
-  reg [18:0] r_envelope_counter = 0;
   reg [3:0] r_envelope_index = 0;
   always @(posedge i_clk) begin
-    if (r_new_note) begin
+    if (i_rst) begin
+      r_envelope_index <= 0;
+    end else if (r_new_note) begin
       r_envelope_index <= 0;
     end else if (i_tick_stb) begin
       if (r_envelope_index == 4'd15) begin
@@ -114,13 +119,15 @@ module channel_1_note_sequencer #(
     (.i_note(r_note), .o_compare(w_phase_delta));
   assign o_envelope = r_envelope;
 
-  reg       r_vibrato_en = 0;
   reg [4:0] r_vibrato_len = 0;
   reg [4:0] r_vibrato_len_count = 0;
   reg [3:0] r_vibrato_index = 0;
 
   always @(posedge i_clk) begin
-    if (i_note_stb) begin
+    if (i_rst) begin
+      r_vibrato_index <= 0;
+      r_vibrato_len_count <= 0;
+    end else if (i_note_stb) begin
       if (r_vibrato_len_count == r_vibrato_len) begin
         r_vibrato_len_count <= 0;
         r_vibrato_index <= r_vibrato_index + 1;
@@ -175,7 +182,9 @@ module channel_1_note_sequencer #(
 
   reg [2:0] r_vibrato_adjust_index = 0;
   always @(posedge i_clk) begin
-    if (r_new_vibrato) begin
+    if (i_rst) begin
+      r_vibrato_adjust_index <= 0;
+    end else if (r_new_vibrato) begin
       r_vibrato_adjust_index <= 0;
     end else if (i_tick_stb) begin
       if (r_vibrato_adjust_index == 3'd07) begin

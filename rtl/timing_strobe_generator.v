@@ -1,7 +1,8 @@
 module timing_strobe_generator #(
   parameter CLOCK_FREQ = 25_000_000
 ) (
-  input wire i_clk,
+  input wire  i_clk,
+  input wire  i_rst,
   output wire o_tick_stb,
   output wire o_beat_stb
 );
@@ -25,7 +26,9 @@ module timing_strobe_generator #(
 
   reg   [TICK_WIDTH-1:0]  r_tick_counter = 0;
   always @(posedge i_clk) begin
-    if (r_tick_counter == CLOCKS_PER_TICK-1) begin
+    if (i_rst) begin
+      r_tick_counter <= 0;
+    end else if (r_tick_counter == CLOCKS_PER_TICK-1) begin
       r_tick_counter <= 0;
     end else begin
       r_tick_counter <= r_tick_counter + 1;
@@ -37,7 +40,9 @@ module timing_strobe_generator #(
   localparam  BEAT_WIDTH = $clog2(TICKS_PER_BEAT);
   reg   [BEAT_WIDTH-1:0]  r_beat_counter = 0;
   always @(posedge i_clk) begin
-    if (o_tick_stb) begin
+    if (i_rst) begin
+      r_beat_counter <= 0;
+    end else if (o_tick_stb) begin
       if (r_beat_counter == TICKS_PER_BEAT-1) begin
         r_beat_counter <= 0;
       end else begin

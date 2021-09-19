@@ -6,6 +6,7 @@ module audio_processing_unit #(
   parameter VIBRATO_TABLE_FILE = ""
 ) (
   input wire          i_clk,
+  input wire          i_rst,
   input wire  [3:0]   i_mixer,
   output wire [8:0]   o_sample,
   output wire [3:0]   o_frame_pulse
@@ -17,6 +18,7 @@ module audio_processing_unit #(
     .CLOCK_FREQ(CLOCK_FREQ)
   ) pulse_generator (
     .i_clk(i_clk),
+    .i_rst(i_rst),
     .o_tick_stb(w_tick_stb),
     .o_beat_stb(w_beat_stb)
   );
@@ -28,6 +30,7 @@ module audio_processing_unit #(
     .VIBRATO_TABLE_FILE(VIBRATO_TABLE_FILE)
   ) pulse_1 (
     .i_clk(i_clk),
+    .i_rst(i_rst),
     .i_tick_stb(w_tick_stb),
     .i_note_stb(w_beat_stb),
     .o_output(w_compare_pulse_1),
@@ -40,6 +43,7 @@ module audio_processing_unit #(
     .NOTE_TABLE_FILE(NOTE_TABLE_FILE)
   ) pulse_2 (
     .i_clk(i_clk),
+    .i_rst(i_rst),
     .i_tick_stb(w_tick_stb),
     .i_note_stb(w_beat_stb),
     .o_output(w_compare_pulse_2),
@@ -52,6 +56,7 @@ module audio_processing_unit #(
     .NOTE_TABLE_FILE(NOTE_TABLE_FILE)
   ) triangle_3 (
     .i_clk(i_clk),
+    .i_rst(i_rst),
     .i_tick_stb(w_tick_stb),
     .i_note_stb(w_beat_stb),
     .o_output(w_triangle_3_output),
@@ -63,6 +68,7 @@ module audio_processing_unit #(
   channel_4_noise #(
   ) noise (
     .i_clk(i_clk),
+    .i_rst(i_rst),
     .i_tick_stb(w_tick_stb),
     .i_note_stb(w_beat_stb),
     .o_output(w_noise_output),

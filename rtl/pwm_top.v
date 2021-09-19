@@ -21,6 +21,12 @@ module pwm_top (
     .o_switches(w_switches)
   );
 
+  wire w_rst;
+  reset_generator reset_generator (
+    .i_clk(i_clk),
+    .o_rst(w_rst)
+  );
+
   wire [3:0] w_mixer = ~w_switches;
   wire [8:0] w_compare;
   wire [3:0] w_frame_pulse;
@@ -30,6 +36,7 @@ module pwm_top (
     .VIBRATO_TABLE_FILE("resources/vibrato_table_25MHz.txt")
   ) apu (
     .i_clk(i_clk),
+    .i_rst(w_rst),
     .i_mixer(w_mixer),
     .o_sample(w_compare),
     .o_frame_pulse(w_frame_pulse)

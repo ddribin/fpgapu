@@ -5,6 +5,7 @@ module channel_2_note_sequencer #(
   parameter NOTE_TABLE_FILE = ""
 ) (
   input wire          i_clk,
+  input wire          i_rst,
   input wire          i_tick_stb,
   input wire          i_note_stb,
 
@@ -24,7 +25,10 @@ module channel_2_note_sequencer #(
   // reg        r_new_note = 0;
 
   always @(posedge i_clk) begin
-    if (i_note_stb) begin
+    if (i_rst) begin
+      r_note_index <= 0;
+      r_duration_count <= 0;
+    end else if (i_note_stb) begin
       if (r_duration_count == r_note_len) begin
         r_duration_count <= 0;
         r_note_index <= r_note_index + 1;
@@ -63,10 +67,11 @@ module channel_2_note_sequencer #(
     endcase
   end
 
-  reg [18:0] r_envelope_counter = 0;
   reg [3:0] r_envelope_index = 0;
   always @(posedge i_clk) begin
-    if (r_new_note) begin
+    if (i_rst) begin
+      r_envelope_index <= 0;
+    end else if (r_new_note) begin
       r_envelope_index <= 0;
     end else if (i_tick_stb) begin
       if (r_envelope_index == 4'd8) begin

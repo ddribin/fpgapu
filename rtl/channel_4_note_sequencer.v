@@ -4,6 +4,7 @@ module channel_4_note_sequencer #(
   parameter NOTE_TABLE_FILE = ""
 ) (
   input wire          i_clk,
+  input wire          i_rst,
   input wire          i_tick_stb,
   input wire          i_note_stb,
 
