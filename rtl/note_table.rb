@@ -54,7 +54,7 @@ NOTES = [
   ["NOISE_A", 4709.9],
   ["NOISE_F", 440.0],
 ]
-SAMPLE_HZ = 1_000_000
+SAMPLE_HZ = 25_000_000
 BPM = 180
 
 COMMAND = File.basename($0)

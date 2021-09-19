@@ -1,6 +1,7 @@
 `default_nettype none
 
 module channel_4_noise #(
+  parameter NOISE_TABLE_FILE = ""
 ) (
   input wire          i_clk,
   input wire          i_rst,
@@ -15,7 +16,9 @@ module channel_4_noise #(
   wire [31:0]   w_phase_delta;
   wire          w_compare_valid = 1;
   wire [8:0]    w_envelope;
-  channel_4_note_sequencer sequencer (
+  channel_4_note_sequencer #(
+    .NOISE_TABLE_FILE(NOISE_TABLE_FILE)
+  ) sequencer (
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_tick_stb(i_tick_stb),

@@ -18,7 +18,8 @@ module fpgapu_sdl_top (
   audio_processing_unit #(
     .CLOCK_FREQ(1_000_000),
     .NOTE_TABLE_FILE("resources/note_table_1MHz.txt"),
-    .VIBRATO_TABLE_FILE("resources/vibrato_table_1MHz.txt")
+    .VIBRATO_TABLE_FILE("resources/vibrato_table_1MHz.txt"),
+    .NOISE_TABLE_FILE("resources/noise_table_1MHz.txt")
   ) apu (
     .i_clk(i_clk),
     .i_rst(w_rst),

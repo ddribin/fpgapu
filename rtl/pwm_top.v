@@ -33,7 +33,8 @@ module pwm_top (
   audio_processing_unit #(
     .CLOCK_FREQ(25_000_000),
     .NOTE_TABLE_FILE("resources/note_table_25MHz.txt"),
-    .VIBRATO_TABLE_FILE("resources/vibrato_table_25MHz.txt")
+    .VIBRATO_TABLE_FILE("resources/vibrato_table_25MHz.txt"),
+    .NOISE_TABLE_FILE("resources/noise_table_25MHz.txt")
   ) apu (
     .i_clk(i_clk),
     .i_rst(w_rst),

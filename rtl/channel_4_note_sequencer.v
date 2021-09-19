@@ -1,7 +1,7 @@
 `default_nettype none
 
 module channel_4_note_sequencer #(
-  parameter NOTE_TABLE_FILE = ""
+  parameter NOISE_TABLE_FILE = ""
 ) (
   input wire          i_clk,
   input wire          i_rst,
@@ -76,15 +76,15 @@ module channel_4_note_sequencer #(
     endcase
   end
 
-  reg   [31:0]  r_phase_delta = 0;
-  always @(*) begin
-    case (r_note)
-      2'd0: begin r_phase_delta = 32'h0; end
-      2'd1: begin r_phase_delta = 32'h001CD5FA; end
-      2'd2: begin r_phase_delta = 32'h0134AB02; end
-      2'd3: begin r_phase_delta = 32'h0E517467; end
-    endcase
-  end
+  wire   [31:0]  r_phase_delta;
+  rom_async #(
+    .WIDTH(32),
+    .DEPTH(4),
+    .INIT_F(NOISE_TABLE_FILE)
+  ) noise_table (
+    .addr(r_note),
+    .data(r_phase_delta)
+  );
   assign o_phase_delta = r_phase_delta;
 
   reg [3:0] r_envelope_index = 0;
