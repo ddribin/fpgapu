@@ -65,8 +65,7 @@ module audio_processing_unit #(
 
   wire [8:0] w_noise_output;
   wire w_frame_pulse_4;
-  channel_4_noise #(
-  ) noise (
+  channel_4_noise noise (
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_tick_stb(w_tick_stb),

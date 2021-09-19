@@ -10,15 +10,12 @@ module channel_4_noise #(
   output wire         o_frame_pulse
 );
   
-  wire w_mode = '0;
-
   wire [7:0]    w_top;
   wire          w_top_valid;
   wire [31:0]   w_phase_delta;
   wire          w_compare_valid = 1;
   wire [8:0]    w_envelope;
-  channel_4_note_sequencer #(
-  ) sequencer (
+  channel_4_note_sequencer sequencer (
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_tick_stb(i_tick_stb),

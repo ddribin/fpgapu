@@ -18,6 +18,9 @@ add_file -verilog -lib work "../timing_strobe_generator.v"
 add_file -verilog -lib work "../rom_async.v" 
 add_file -verilog -lib work "../audio_processing_unit.v" 
 add_file -verilog -lib work "../switch_synchronizers.v" 
+add_file -verilog -lib work "../reset_generator.v" 
+add_file -verilog -lib work "../channel_4_noise.v" 
+add_file -verilog -lib work "../channel_4_note_sequencer.v" 
 #implementation: "pwm_Implmnt"
 impl -add pwm_Implmnt -type fpga
 

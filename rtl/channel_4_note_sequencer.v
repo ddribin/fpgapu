@@ -31,7 +31,7 @@ module channel_4_note_sequencer #(
         r_duration_count <= 0;
         r_note_index <= r_note_index + 1;
         if (r_note_index == 5'd23) begin
-          r_note_index <= '0;
+          r_note_index <= 5'd0;
         end
       end else begin
         r_duration_count <= r_duration_count + 1;
