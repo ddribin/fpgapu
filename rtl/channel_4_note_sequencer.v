@@ -23,7 +23,10 @@ module channel_4_note_sequencer #(
   reg [4:0]  r_note_len = 0;
 
   always @(posedge i_clk) begin
-    if (i_note_stb) begin
+    if (i_rst) begin
+      r_note_index <= 0;
+      r_duration_count <= 0;
+    end else if (i_note_stb) begin
       if (r_duration_count == r_note_len) begin
         r_duration_count <= 0;
         r_note_index <= r_note_index + 1;
@@ -86,7 +89,9 @@ module channel_4_note_sequencer #(
 
   reg [3:0] r_envelope_index = 0;
   always @(posedge i_clk) begin
-    if (r_new_note) begin
+    if (i_rst) begin
+      r_envelope_index <= 0;
+    end else if (r_new_note) begin
       r_envelope_index <= 0;
     end else if (i_tick_stb) begin
       if (r_envelope_index == 4'd9) begin

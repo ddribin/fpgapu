@@ -104,6 +104,7 @@ int main(int argc, char* argv[])
     bool mute_2 = false;
     bool mute_3 = false;
     bool mute_4 = false;
+    bool reset = false;
 
     // These are accessed in the audio callback, which is a separate thread, so need to lock it.
     // Probably not needed since the device is still paused, but this ensures proper memory barriers.
@@ -129,6 +130,7 @@ int main(int argc, char* argv[])
         
         SDL_LockAudioDevice(id);
         top->i_mixer = mixer;
+        top->i_rst = reset;
         SDL_UnlockAudioDevice(id);
 
         SDL_Event e;
@@ -154,6 +156,20 @@ int main(int argc, char* argv[])
 
                     case SDLK_4:
                         mute_4 = !mute_4;
+                        break;
+
+                    case SDLK_r:
+                        reset = true;
+                        break;
+
+                    default:
+                        break;
+                }
+            } else if (e.type == SDL_KEYUP) {
+				int key = e.key.keysym.sym;
+				switch (key) {
+                    case SDLK_r:
+                        reset = false;
                         break;
 
                     default:
