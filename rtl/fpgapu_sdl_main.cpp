@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "PWD: %s\n", getcwd(NULL, 0));
 
-	double delta = SAMPLE_FREQ * pow(2, COUNTER_WIDTH)/CLOCK_FREQ;
+    double delta = SAMPLE_FREQ * pow(2, COUNTER_WIDTH)/CLOCK_FREQ;
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Callback delta: %f", delta);
 
     bool mute_1 = false;
@@ -140,8 +140,8 @@ int main(int argc, char* argv[])
                 SDL_PauseAudioDevice(id, 1);
                 running = false;
             } else if (e.type == SDL_KEYDOWN) {
-				int key = e.key.keysym.sym;
-				switch (key) {
+                int key = e.key.keysym.sym;
+                switch (key) {
                     case SDLK_1:
                         mute_1 = !mute_1;
                         break;
@@ -166,8 +166,8 @@ int main(int argc, char* argv[])
                         break;
                 }
             } else if (e.type == SDL_KEYUP) {
-				int key = e.key.keysym.sym;
-				switch (key) {
+                int key = e.key.keysym.sym;
+                switch (key) {
                     case SDLK_r:
                         reset = false;
                         break;
