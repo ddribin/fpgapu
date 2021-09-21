@@ -171,7 +171,7 @@ module channel_1_note_sequencer #(
   rom_async #(
     .WIDTH(64),
     .DEPTH(8),
-    .INIT_F(VIBRATO_TABLE_FILE)
+    .FILE(VIBRATO_TABLE_FILE)
   ) vibrato_table (
     .addr(r_vibrato_depth),
     .data(r_vibrato_depths)

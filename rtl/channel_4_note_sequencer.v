@@ -80,7 +80,7 @@ module channel_4_note_sequencer #(
   rom_async #(
     .WIDTH(32),
     .DEPTH(4),
-    .INIT_F(NOISE_TABLE_FILE)
+    .FILE(NOISE_TABLE_FILE)
   ) noise_table (
     .addr(r_note),
     .data(r_phase_delta)
