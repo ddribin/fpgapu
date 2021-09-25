@@ -1,0 +1,29 @@
+// Pattern: 0
+0740   // RST 30
+
+// Pattern: 1
+0458   // Cs5 18
+00D9   // Fs5  4
+00DA   // Gs5  4
+00DD   // B5   4
+
+// Pattern: 2
+015D   // B5   6
+005C   // As5  2
+035C   // As5 14
+00DA   // Gs5  4
+00D9   // Fs5  4
+
+// Pattern: 3
+02DF   // Cs6 12
+02D9   // Fs5 12
+0760   // Fs6 30
+// Invalid pattern length: 54 expected 30
+
+// Pattern: 4
+00E1   // Gs6  4
+0060   // Fs6  2
+// Invalid pattern length: 6 expected 30
+
+// Pattern: 5
+0765   // Cs7 30

@@ -2,6 +2,8 @@
 
 require 'pp'
 require 'optparse'
+require 'json'
+require 'ostruct'
 
 NOTES = [
   ["RST", 0],
@@ -53,6 +55,12 @@ NOTES = [
   ["NOISE_3", 55930.4],
   ["NOISE_A", 4709.9],
   ["NOISE_F", 440.0],
+]
+
+NOISE = [
+  ["3", 55930.4],
+  ["A", 4709.9],
+  ["F", 440.0],
 ]
 SAMPLE_HZ = 25_000_000
 BPM = 180
@@ -140,13 +148,18 @@ def famicount_to_freq(famicount)
   freq_hz = FAMI_CPU_HZ/(16*(famicount + 1))
 end
 
+Note = Struct.new(:name, :freq_hz, :table_index, keyword_init: true)
+
 def notes_by_name
-  hash = {}
-  NOTES.each do |note|
-    next if note.count == 0
-    hash[note[0]] = note[1]
+  by_name = {}
+  table_index = 0
+  NOTES.each do |note_array|
+    next if note_array.count == 0
+    note = Note.new(name: note_array[0], freq_hz: note_array[1], table_index: table_index)
+    by_name[note.name] = note
+    table_index += 1
   end
-  return hash
+  return by_name
 end
 
 VIBRATO_SPEED = [0, 64, 32, 21, 16, 13, 11, 9, 8, 7, 6, 5, 4]
@@ -158,7 +171,7 @@ def print_vibrato(speed, depth, note_name)
   puts "note: #{note_name} speed: #{speed} depth: #{depth}"
 
   notes = notes_by_name
-  base_freq = notes[note_name]
+  base_freq = notes[note_name].freq_hz
   base_count = freq_to_count(base_freq)
   base_famicount = freq_to_famicount(base_freq)
   length = VIBRATO_SPEED[speed]
@@ -179,6 +192,54 @@ def print_vibrato(speed, depth, note_name)
   end
 end
 
+PatternInfo = Struct.new(:pattern, :length, keyword_init: true)
+Pattern = Struct.new(:note, :duration, :instrument, keyword_init: true)
+
+def convert_song(file)
+  text = File.read(file)
+  json = JSON.parse(text) #, object_class: OpenStruct)
+  channels = json['channels']
+  square1 = channels['square1']
+#  pp square1
+
+  order_json = square1['order']
+  order = order_json.map { |o| PatternInfo.new(pattern: o[0], length: o[1]) }
+#  pp order
+
+  patterns_json = square1['patterns']
+  patterns = patterns_json.map do |patterns|
+    patterns.map do |p|
+      Pattern.new(note: p[0], duration: p[1], instrument: p[2])
+    end
+  end
+#  pp patterns
+
+  notes_by_name = notes_by_name()
+
+  separator = ""
+  order.each do |info|
+    pattern_index = info.pattern
+    pattern_length = info.length
+    pattern = patterns[pattern_index]
+    actual_length = 0
+    puts "#{separator}// Pattern: #{pattern_index}"
+    pattern.each do |row|
+      if (row.note == "TIE")
+        value = 0xFFFF
+      else
+        note = notes_by_name[row.note]
+        value = ((row.duration-1) << 6) | note.table_index
+      end
+      printf "%04X   // %-3s %2d\n", value, row.note, row.duration
+      actual_length += row.duration
+    end
+    if actual_length != pattern_length
+      puts "// Invalid pattern length: #{actual_length} expected #{pattern_length}"
+    end
+    separator = "\n"
+  end
+end
+
 if ARGV.length == 0
   $stderr.puts USAGE
   return 1
@@ -195,6 +256,8 @@ when "duration"
   print_duration_table
 when "vibrato"
   print_vibrato(ARGV[1].to_i, ARGV[2].to_i, ARGV[3])
+when "song"
+  convert_song(ARGV[1])
 else
   $stderr.puts USAGE
   return 1

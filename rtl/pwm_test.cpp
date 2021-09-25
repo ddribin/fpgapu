@@ -36,7 +36,7 @@ struct PwmFixture : TestFixture<UUT>
 
 using Fixture = PwmFixture;
 
-TEST_CASE_METHOD(Fixture, "Initial state", "[pwm]")
+TEST_CASE_METHOD(Fixture, "PWM initial state", "[pwm]")
 {
     REQUIRE(core.o_pwm == 0);
 }

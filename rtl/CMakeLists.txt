@@ -7,6 +7,9 @@ target_compile_features(${LIB_TARGET_NAME} PUBLIC cxx_std_11)
 verilate(${LIB_TARGET_NAME} SOURCES pwm_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES pwm_top.v)
 verilate(${LIB_TARGET_NAME} SOURCES timing_strobe_generator.v)
+verilate(${LIB_TARGET_NAME} SOURCES note_sequencer_tb.v TRACE)
+verilate(${LIB_TARGET_NAME} SOURCES rom_sync_fake.v TRACE
+    VERILATOR_ARGS -GWIDTH=16 -GDEPTH=17)
 
 set(SDL_TARGET_NAME FPGAPU)
 add_executable(${SDL_TARGET_NAME} fpgapu_sdl_main.cpp)
@@ -25,6 +28,8 @@ include(Catch)
 set(TEST_TARGET_NAME ${BASE_NAME}_tests)
 add_executable(${TEST_TARGET_NAME}
     pwm_test.cpp
+    note_sequencer_test.cpp
+    rom_sync_fake_test.cpp
     ../common/test-common.hpp
     ../common/test-main.cpp
 )

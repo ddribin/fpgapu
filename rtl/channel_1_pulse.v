@@ -12,6 +12,17 @@ module channel_1_pulse  #(
   output wire         o_frame_pulse
 );
   
+  wire [4:0]  w_rom_addr;
+  wire [15:0] w_rom_data;
+  rom_async #(
+    .WIDTH(16),
+    .DEPTH(17),
+    .FILE("resources/channel_1.txt")
+  ) pattern_table (
+    .addr(w_rom_addr),
+    .data(w_rom_data)
+  );
+
   wire [7:0]    w_top;
   wire          w_top_valid;
   wire [31:0]   w_phase_delta;
@@ -25,6 +36,8 @@ module channel_1_pulse  #(
     .i_rst(i_rst),
     .i_tick_stb(i_tick_stb),
     .i_note_stb(i_note_stb),
+    .o_rom_addr(w_rom_addr),
+    .i_rom_data(w_rom_data),
     .o_top(w_top),
     .o_top_valid(w_top_valid),
     .o_phase_delta(w_phase_delta),
