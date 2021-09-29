@@ -5,45 +5,26 @@ module note_sequencer #(
 ) (
   input wire          i_clk,
   input wire          i_rst,
-  input wire          i_tick_stb,
   input wire          i_note_stb,
 
   output wire [4:0]   o_rom_addr,
   input wire  [15:0]  i_rom_data
-
-
-  // input wire          clk,
-  // input wire          rst,
-  // input wire          advance_note_en,
-
-  // input wire  [7:0]   initial_addr,
-  // input wire          initial_addr_valid,
-
-  // output wire [7:0]   rom_rd_addr,
-  // input wire  [15:0]  rom_rd_data,
-
-  // output wire [5:0]   note,       // 6 bits
-  // output wire [4:0]   note_len,   // 5 bits
-  // output wire [1:0]   instrument, // 2 bits
-  // output wire         sequence_complete
 );
   
-  // localparam STATE_IDLE = 0;
-  // localparam STATE_OUTPUT_ADDR = 1;
-  // localparam STATE_INPUT_DATA = 2;
-
   reg [4:0] r_duration_count = 0;
   reg [4:0] r_note_index = 0;
 
   reg [5:0]  r_note = 0;
   reg [4:0]  r_note_len = 0;
-  reg        r_note_stb_z = 0;
+  reg        i_note_stb_q1 = 0;
+  reg        i_note_stb_q2 = 0;
 
   always @(posedge i_clk) begin
     if (i_rst) begin
       r_note_index <= 0;
       r_duration_count <= 0;
-      r_note_stb_z <= 0;
+      i_note_stb_q1 <= 0;
+      i_note_stb_q2 <= 0;
     end else if (i_note_stb) begin
       if (r_duration_count == r_note_len) begin
         r_duration_count <= 0;
@@ -55,7 +36,8 @@ module note_sequencer #(
         r_duration_count <= r_duration_count + 1;
       end
     end
-    r_note_stb_z <= i_note_stb;
+    i_note_stb_q1 <= i_note_stb;
+    i_note_stb_q2 <= i_note_stb_q1;
   end
   wire r_new_note = i_note_stb & (r_duration_count == r_note_len);
 
