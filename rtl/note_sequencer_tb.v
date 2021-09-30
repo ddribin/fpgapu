@@ -6,6 +6,7 @@ module note_sequencer_tb #(
   input wire          i_clk,
   input wire          i_rst,
   input wire          i_note_stb,
+  output wire         o_new_note_valid,
 
   output wire [4:0]   o_rom_addr,
   output wire  [15:0] i_rom_data,
@@ -38,6 +39,7 @@ module note_sequencer_tb #(
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_note_stb(r_note_stb),
+    .o_new_note_valid(o_new_note_valid),
 
     .o_rom_addr(o_rom_addr),
     .i_rom_data(i_rom_data)
