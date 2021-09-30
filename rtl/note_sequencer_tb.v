@@ -13,6 +13,11 @@ module note_sequencer_tb #(
   input wire  [15:0]  zz_memory[DEPTH]
 );
 
+  reg [7:0] CLK = 0;
+  always @(posedge i_clk) begin
+    CLK <= CLK + 1;
+  end
+
   rom_sync_fake #(
     .WIDTH(16),
     .DEPTH(DEPTH)

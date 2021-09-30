@@ -8,7 +8,7 @@ struct Vnote_sequencer_adapter : public Vnote_sequencer_tb
 
 using UUT = Vnote_sequencer_adapter;
 
-#define NOTE(NOTE, LEN) (NOTE | (LEN << 6))
+#define NOTE(NOTE, LEN, INSTRUMENT) (NOTE | (LEN << 6) | (INSTRUMENT << 11))
 
 struct NoteSequencerFixture : TestFixture<UUT>
 {
@@ -17,11 +17,11 @@ struct NoteSequencerFixture : TestFixture<UUT>
         i_note_stb(makeInput(&UUT::i_note_stb))
     {
         static uint16_t ROM[15] = {
-            NOTE(0x05, 2), NOTE(0x15, 1), NOTE(0x10, 0),
-            NOTE(0x05, 2), NOTE(0x15, 1), NOTE(0x10, 0),
-            NOTE(0x05, 2), NOTE(0x15, 1), NOTE(0x10, 0),
-            NOTE(0x05, 2), NOTE(0x15, 1), NOTE(0x10, 0),
-            NOTE(0x05, 2), NOTE(0x15, 1), NOTE(0x10, 0),
+            NOTE(0x05, 2, 0x3), NOTE(0x15, 1, 0x9), NOTE(0x10, 0, 0xB),
+            NOTE(0x05, 2, 0x3), NOTE(0x15, 1, 0x9), NOTE(0x10, 0, 0xB),
+            NOTE(0x05, 2, 0x3), NOTE(0x15, 1, 0x9), NOTE(0x10, 0, 0xB),
+            NOTE(0x05, 2, 0x3), NOTE(0x15, 1, 0x9), NOTE(0x10, 0, 0xB),
+            NOTE(0x05, 2, 0x3), NOTE(0x15, 1, 0x9), NOTE(0x10, 0, 0xB),
         };
         memcpy(core.zz_memory, ROM, sizeof(ROM));
     }
