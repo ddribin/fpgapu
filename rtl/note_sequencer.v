@@ -8,8 +8,9 @@ module note_sequencer #(
   input wire          i_note_stb,
   output wire         o_new_note_valid,
 
-  // input wire [4:0]    i_new_addr,
-  // input wire          i_new_addr_valid,
+  input wire [4:0]    i_new_addr,
+  input wire [4:0]    i_new_pattern_len,
+  input wire          i_new_addr_valid,
 
   output wire [4:0]   o_rom_addr,
   input wire  [15:0]  i_rom_data
@@ -23,7 +24,7 @@ module note_sequencer #(
   reg [3:0]  r_new_instrument = '0;
   reg        i_note_stb_q1 = 0;
   reg        r_new_note_valid = '0;
-  reg [4:0]  r_note_len = '0;
+  reg [4:0]  r_pattern_len = 0;
 
   always @(posedge i_clk) begin
     if (i_rst) begin
@@ -31,8 +32,13 @@ module note_sequencer #(
       r_duration_count <= 0;
       i_note_stb_q1 <= 0;
       r_new_note_valid <= 0;
+    // end else if (i_new_addr_valid) begin
+    //   r_pattern_len <= r_pattern_len - 1;
     end else if (i_note_stb) begin
-      if (r_duration_count == r_new_note_len) begin
+      r_pattern_len <= r_pattern_len - 1;
+      if (i_new_addr_valid) begin
+        r_note_index <= i_new_addr + 1;
+      end else if (r_duration_count == r_new_note_len) begin
         r_new_note_valid <= 1;
         r_duration_count <= 0;
 
@@ -54,6 +60,6 @@ module note_sequencer #(
   end
   assign o_new_note_valid = i_note_stb_q1 & r_new_note_valid;
 
-  assign o_rom_addr = r_note_index;
+  assign o_rom_addr = i_new_addr_valid? i_new_addr : r_note_index;
   
 endmodule
