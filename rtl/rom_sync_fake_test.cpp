@@ -1,12 +1,12 @@
 #include "test-common.hpp"
 #include "Vrom_sync_fake.h"
 
-struct Vrom_sync_fake_adapter : public Vrom_sync_fake
-{
-    void setClock(uint64_t clock) { clk = clock; }
-};
 
-using UUT = Vrom_sync_fake_adapter;
+void setClock(Vrom_sync_fake& core, uint8_t clock) {
+    core.clk = clock;
+}
+
+using UUT = Vrom_sync_fake;
 
 struct RomSyncFakeFixture : TestFixture<UUT>
 {
@@ -27,7 +27,6 @@ using Fixture = RomSyncFakeFixture;
 
 TEST_CASE_METHOD(Fixture, "Fake synchronous ROM lookup", "[rom]")
 {
-    bench.openTrace("/tmp/rom_sync_lookup.vcd");
     addr.addInputs({
         {5, 1}, {10, 2}, {12, 3}
     });
@@ -35,6 +34,6 @@ TEST_CASE_METHOD(Fixture, "Fake synchronous ROM lookup", "[rom]")
     bench.tick(20);
 
     CHECK(data.changes() == ChangeVector16({
-        {1,  16}, {5, 15}, {10, 14}, {12, 23}
+        {1,  16}, {6, 15}, {11, 14}, {13, 23}
     }));
 }

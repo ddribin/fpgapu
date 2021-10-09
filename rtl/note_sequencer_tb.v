@@ -42,8 +42,7 @@ module note_sequencer_tb #(
   note_sequencer seq (
     .i_clk(i_clk),
     .i_rst(i_rst),
-    .i_note_stb_1(i_note_stb_tb),
-    .i_note_stb_2(r_note_stb_tb),
+    .i_note_stb(i_note_stb_tb),
     .o_new_note_valid(o_new_note_valid),
 
     .i_new_addr(i_new_addr),

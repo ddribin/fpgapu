@@ -4,7 +4,8 @@ set(LIB_TARGET_NAME ${BASE_NAME}_lib)
 add_library(${LIB_TARGET_NAME} STATIC)
 target_compile_features(${LIB_TARGET_NAME} PUBLIC cxx_std_11)
 
-verilate(${LIB_TARGET_NAME} SOURCES pwm_tb.v TRACE)
+verilate(${LIB_TARGET_NAME} SOURCES pwm.v TRACE
+    VERILATOR_ARGS -GRESOLUTION=4)
 verilate(${LIB_TARGET_NAME} SOURCES pwm_top.v)
 verilate(${LIB_TARGET_NAME} SOURCES timing_strobe_generator.v)
 verilate(${LIB_TARGET_NAME} SOURCES note_sequencer_tb.v TRACE)
@@ -30,7 +31,7 @@ add_executable(${TEST_TARGET_NAME}
     pwm_test.cpp
     note_sequencer_test.cpp
     rom_sync_fake_test.cpp
-    ../common/test-common.hpp
+    ../common/test-listener.cpp
     ../common/test-main.cpp
 )
 

@@ -1,12 +1,11 @@
 #include "test-common.hpp"
 #include "Vnote_sequencer_tb.h"
 
-struct Vnote_sequencer_adapter : public Vnote_sequencer_tb
-{
-    void setClock(uint64_t clock) { i_clk = clock; }
-};
+void setClock(Vnote_sequencer_tb& core, uint8_t clock) {
+    core.i_clk = clock;
+}
 
-using UUT = Vnote_sequencer_adapter;
+using UUT = Vnote_sequencer_tb;
 
 #define NOTE(NOTE, LEN, INSTRUMENT) (NOTE | (LEN << 6) | (INSTRUMENT << 11))
 
@@ -53,16 +52,14 @@ using Fixture = NoteSequencerFixture;
 
 TEST_CASE_METHOD(Fixture, "Sequencer Test", "[seq]")
 {
-    bench.openTrace("/tmp/sequencer_test.vcd");
     setupNoteStrobe(100);
-    setupNewPattern(0, 15, 5);
+    setupNewPattern(0, 3, 5);
 
     bench.tick(103);
 }
 
 TEST_CASE_METHOD(Fixture, "Sequencer Test 2", "[seq]")
 {
-    bench.openTrace("/tmp/sequencer_test_2.vcd");
     setupNoteStrobe(100);
     // setupNewPattern(3, 2, 5);
     
