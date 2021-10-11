@@ -27,6 +27,7 @@ module note_sequencer #(
   reg [4:0]  r_new_note_len = '0;
   reg [3:0]  r_new_instrument = '0;
   reg        i_note_stb_q1 = 0;
+  reg        i_new_addr_valid_q1 = 0;
   reg        r_new_note_valid = '0;
   reg [4:0]  r_pattern_len = 0;
 
@@ -40,7 +41,8 @@ module note_sequencer #(
       if (i_new_addr_valid) begin
         r_note_index <= i_new_addr + 1;
         r_pattern_len <= i_new_pattern_len;
-      end else if (r_duration_count == r_new_note_len) begin
+        r_new_note_valid <= 1;
+      end else if (i_new_addr_valid_q1 || (r_duration_count == r_new_note_len)) begin
         r_new_note_valid <= 1;
         r_duration_count <= 0;
 
@@ -59,6 +61,7 @@ module note_sequencer #(
       end
     end
     i_note_stb_q1 <= i_note_stb;
+    i_new_addr_valid_q1 <= i_new_addr_valid;
   end
   assign o_new_note_valid = i_note_stb_q1 & r_new_note_valid;
 
