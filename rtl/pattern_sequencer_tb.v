@@ -1,8 +1,7 @@
 `default_nettype none
 
 module pattern_sequencer_tb #(
-  parameter   DEPTH = 8,
-  localparam  ADDRW=$clog2(DEPTH)
+  localparam DEPTH = 256
 ) (
   input wire          i_clk,
   input wire          i_rst,
@@ -13,7 +12,7 @@ module pattern_sequencer_tb #(
   output wire [4:0]         o_note_len,
   output wire [3:0]         o_instrument,
 
-  output wire [ADDRW-1:0]   o_rom_addr,
+  output wire [7:0]         o_rom_addr,
   output wire [15:0]        i_rom_data,
   input wire  [15:0]        zz_memory[DEPTH]
 );
@@ -33,8 +32,6 @@ module pattern_sequencer_tb #(
     .memory(zz_memory)
   );
 
-  pattern_sequencer #(
-    .DEPTH(DEPTH)
-  ) seq (.*);
+  pattern_sequencer seq (.*);
 
 endmodule
