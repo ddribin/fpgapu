@@ -89,30 +89,32 @@ module pattern_sequencer #(
     end else begin
       state <= state_nxt;
 
-      if (state == STATE_READ_ORDER_DATA) begin
-        pattern_addr <= i_rom_data[7:0];
-        pattern_len <= i_rom_data[15:8];
-        pattern_count <= 1;
-      end
+      case (state)
+        STATE_READ_ORDER_DATA: begin
+          pattern_addr <= i_rom_data[7:0];
+          pattern_len <= i_rom_data[15:8];
+          pattern_count <= 1;
+        end
 
-      if (state == STATE_READ_PATTERN_DATA) begin
-        note_pitch <= i_rom_data[5:0];
-        note_len <= i_rom_data[10:6];
-        note_instrument <= i_rom_data[14:11];
-      end
+        STATE_READ_PATTERN_DATA: begin
+          note_pitch <= i_rom_data[5:0];
+          note_len <= i_rom_data[10:6];
+          note_instrument <= i_rom_data[14:11];
+        end
 
-      if (state == STATE_OUTPUT_NOTE) begin
-        if (state_nxt == STATE_IDLE_IN_PATTERN) begin
-          pattern_addr <= pattern_addr + 1;
-          pattern_count <= pattern_count + 1;
-        end else begin
-          if (order_addr == 8'h01) begin
-            order_addr <= 8'h00;
+        STATE_OUTPUT_NOTE: begin
+          if (state_nxt == STATE_IDLE_IN_PATTERN) begin
+            pattern_addr <= pattern_addr + 1;
+            pattern_count <= pattern_count + 1;
           end else begin
-            order_addr <= order_addr + 1;
+            if (order_addr == 8'h01) begin
+              order_addr <= 8'h00;
+            end else begin
+              order_addr <= order_addr + 1;
+            end
           end
         end
-      end
+      endcase
     end
   end
 
@@ -123,10 +125,6 @@ module pattern_sequencer #(
     end else if (state == STATE_OUTPUT_PATTERN_ADDR) begin
       o_rom_addr = pattern_addr;
     end
-
-    // note_pitch = i_rom_data[5:0];
-    // note_len = i_rom_data[10:6];
-    // note_instrument = i_rom_data[14:11];
   end
 
   assign o_note_valid = (state == STATE_OUTPUT_NOTE);
