@@ -8,9 +8,9 @@ module pattern_sequencer_tb #(
   input wire          i_note_stb,
 
   output wire               o_note_valid,
-  output wire [5:0]         o_note,
+  output wire [5:0]         o_note_pitch,
   output wire [4:0]         o_note_len,
-  output wire [3:0]         o_instrument,
+  output wire [3:0]         o_note_instrument,
 
   output wire [7:0]         o_rom_addr,
   output wire [15:0]        i_rom_data,

@@ -16,9 +16,15 @@ struct PatternSequencerFixture : TestFixture<UUT>
 {
     Input8 i_note_stb;
     Output8 o_note_valid;
+    Output8 o_note_pitch;
+    Output8 o_note_len;
+    Output8 o_note_instrument;
     PatternSequencerFixture() :
         i_note_stb(makeInput(&UUT::i_note_stb)),
-        o_note_valid(makeOutput(&UUT::o_note_valid))
+        o_note_valid(makeOutput(&UUT::o_note_valid)),
+        o_note_pitch(makeOutput(&UUT::o_note_pitch)),
+        o_note_len(makeOutput(&UUT::o_note_len)),
+        o_note_instrument(makeOutput(&UUT::o_note_instrument))
     {
     static uint16_t ROM[] = {
         /* 0x00 */  PATTERN(0x02, 3),
@@ -50,11 +56,14 @@ using Fixture = PatternSequencerFixture;
 
 TEST_CASE_METHOD(Fixture, "Pattern sequencer initial outputs", "[pattern-seq]")
 {
-    setupNoteStrobe(30);
+    setupNoteStrobe(75);
 
-    bench.tick(50);
+    bench.tick(75);
 
     // CHECK(o_note_valid.changes() == ChangeVector8());
+    // CHECK(o_note_pitch.changes() == ChangeVector8());
+    // CHECK(o_note_len.changes() == ChangeVector8());
+    // CHECK(o_note_instrument.changes() == ChangeVector8());
 }
 
 static void state_machine(void)
