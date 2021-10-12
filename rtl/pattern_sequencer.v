@@ -21,6 +21,7 @@ module pattern_sequencer #(
   localparam STATE_READ_ORDER_DATA        = 2;
   localparam STATE_OUTPUT_PATTERN_ADDR    = 3;
   localparam STATE_READ_PATTERN_DATA      = 4;
+  localparam STATE_OUTPUT_NOTE            = 5;
 
   localparam STATE_WIDTH = 3;
   reg [STATE_WIDTH-1:0]   state;
@@ -57,6 +58,10 @@ module pattern_sequencer #(
       end
 
       STATE_READ_PATTERN_DATA: begin
+        state_nxt = STATE_OUTPUT_NOTE;
+      end
+
+      STATE_OUTPUT_NOTE: begin
         state_nxt = STATE_IDLE;
       end
     endcase
@@ -76,11 +81,11 @@ module pattern_sequencer #(
         pattern_len <= i_rom_data[15:8];
       end
 
-      // if (state == STATE_READ_PATTERN_DATA) begin
-      //   note <= i_rom_data[5:0];
-      //   note_len <= i_rom_data[10:6];
-      //   instrument <= i_rom_data[14:11];
-      // end
+      if (state == STATE_READ_PATTERN_DATA) begin
+        note_pitch <= i_rom_data[5:0];
+        note_len <= i_rom_data[10:6];
+        note_instrument <= i_rom_data[14:11];
+      end
 
       if (state == STATE_READ_PATTERN_DATA) begin
         if (order_addr == 8'h01) begin
@@ -100,14 +105,14 @@ module pattern_sequencer #(
       o_rom_addr = pattern_addr;
     end
 
-    note_pitch = i_rom_data[5:0];
-    note_len = i_rom_data[10:6];
-    note_instrument = i_rom_data[14:11];
+    // note_pitch = i_rom_data[5:0];
+    // note_len = i_rom_data[10:6];
+    // note_instrument = i_rom_data[14:11];
   end
 
   assign o_note = note_pitch;
   assign o_note_len = note_len;
   assign o_instrument = note_instrument;
-  assign o_note_valid = (state == STATE_READ_PATTERN_DATA);
+  assign o_note_valid = (state == STATE_OUTPUT_NOTE);
   
 endmodule
