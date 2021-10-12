@@ -30,9 +30,9 @@ module pattern_sequencer #(
   reg [7:0]   pattern_addr;
   reg [7:0]   pattern_len;
 
-  reg [5:0]   note;
+  reg [5:0]   note_pitch;
   reg [4:0]   note_len;
-  reg [3:0]   instrument;
+  reg [3:0]   note_instrument;
 
   always @(*) begin
     state_nxt = state;
@@ -100,14 +100,14 @@ module pattern_sequencer #(
       o_rom_addr = pattern_addr;
     end
 
-    note = i_rom_data[5:0];
+    note_pitch = i_rom_data[5:0];
     note_len = i_rom_data[10:6];
-    instrument = i_rom_data[14:11];
+    note_instrument = i_rom_data[14:11];
   end
 
-  assign o_note = note;
+  assign o_note = note_pitch;
   assign o_note_len = note_len;
-  assign o_instrument = instrument;
+  assign o_instrument = note_instrument;
   assign o_note_valid = (state == STATE_READ_PATTERN_DATA);
   
 endmodule

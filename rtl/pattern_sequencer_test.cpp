@@ -1,6 +1,8 @@
 #include "test-common.hpp"
 #include "Vpattern_sequencer_tb.h"
 
+#include <iostream>
+
 void setClock(Vpattern_sequencer_tb& core, uint8_t clock) {
     core.i_clk = clock;
 }
@@ -13,8 +15,10 @@ using UUT = Vpattern_sequencer_tb;
 struct PatternSequencerFixture : TestFixture<UUT>
 {
     Input8 i_note_stb;
+    Output8 o_note_valid;
     PatternSequencerFixture() :
-        i_note_stb(makeInput(&UUT::i_note_stb))
+        i_note_stb(makeInput(&UUT::i_note_stb)),
+        o_note_valid(makeOutput(&UUT::o_note_valid))
     {
     static uint16_t ROM[] = {
         /* 0x00 */  PATTERN(0x02, 3),
@@ -49,6 +53,8 @@ TEST_CASE_METHOD(Fixture, "Pattern sequencer initial outputs", "[pattern-seq]")
     setupNoteStrobe(30);
 
     bench.tick(50);
+
+    // CHECK(o_note_valid.changes() == ChangeVector8());
 }
 
 static void state_machine(void)
