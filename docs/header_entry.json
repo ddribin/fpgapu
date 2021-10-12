@@ -1,0 +1,28 @@
+{
+    "config": {
+        "bits": 16
+    },
+    "reg": [
+        {
+            "bits": 8,
+            "type": 2,
+            "name": "address (0-255)",
+            "attr": "destination of repeat"
+        },
+        {
+            "bits": 5,
+            "type": 3,
+            "name": "length (0-31)",
+            "attr": "number of order entries"
+        },
+        {
+            "bits": 1,
+            "type": 4,
+            "name": "repeat"
+        },
+        {
+            "bits": 2,
+            "type": 1
+        }
+    ]
+}
