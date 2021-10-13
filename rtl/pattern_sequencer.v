@@ -16,16 +16,16 @@ module pattern_sequencer (
 );
 
   localparam STATE_INIT                   = 4'd0;
-  localparam STATE_OUTPUT_HEADER_ADDR     = 4'd10;
-  localparam STATE_READ_HEADER_DATA       = 4'd1;
-  localparam STATE_IDLE                   = 4'd2;
-  localparam STATE_OUTPUT_ORDER_ADDR      = 4'd3;
-  localparam STATE_READ_ORDER_DATA        = 4'd4;
-  localparam STATE_OUTPUT_PATTERN_ADDR    = 4'd5;
-  localparam STATE_READ_PATTERN_DATA      = 4'd6;
-  localparam STATE_OUTPUT_NOTE            = 4'd7;
-  localparam STATE_IDLE_IN_PATTERN        = 4'd8;
-  localparam STATE_STOPPED                = 4'd9;
+  localparam STATE_OUTPUT_HEADER_ADDR     = 4'd1;
+  localparam STATE_READ_HEADER_DATA       = 4'd2;
+  localparam STATE_IDLE                   = 4'd3;
+  localparam STATE_OUTPUT_ORDER_ADDR      = 4'd4;
+  localparam STATE_READ_ORDER_DATA        = 4'd5;
+  localparam STATE_OUTPUT_PATTERN_ADDR    = 4'd6;
+  localparam STATE_READ_PATTERN_DATA      = 4'd7;
+  localparam STATE_OUTPUT_NOTE            = 4'd8;
+  localparam STATE_IDLE_IN_PATTERN        = 4'd9;
+  localparam STATE_STOPPED                = 4'd10;
 
   localparam STATE_WIDTH = 4;
   reg [STATE_WIDTH-1:0]   state;
