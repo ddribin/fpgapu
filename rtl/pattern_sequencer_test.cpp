@@ -9,7 +9,7 @@ void setClock(Vpattern_sequencer_tb& core, uint8_t clock) {
 
 using UUT = Vpattern_sequencer_tb;
 
-#define HEADER(LEN, REPEAT, ADDR) (ADDR | (LEN << 8) | (REPEAT << 13))
+#define HEADER(LAST_ADDR, REPEAT, REPEAT_ADDR) (LAST_ADDR | (REPEAT_ADDR << 6) | (REPEAT << 12))
 #define NOTE(NOTE, LEN, INSTRUMENT) (NOTE | (LEN << 6) | (INSTRUMENT << 11))
 #define PATTERN(NUMBER, LEN) (NUMBER | (LEN << 8))
 
@@ -59,7 +59,7 @@ using Fixture = PatternSequencerFixture;
 TEST_CASE_METHOD(Fixture, "Single pattern stop", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(1, 0, 0x00),
+        /* 0x00 */  HEADER(0x01, 0, 0x00),
         /* 0x01 */  PATTERN(0x02, 2),
 
         // Pattern 0
@@ -77,7 +77,7 @@ TEST_CASE_METHOD(Fixture, "Single pattern stop", "[pattern-seq]")
 TEST_CASE_METHOD(Fixture, "Multi pattern stop", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(2, 0, 0x00),
+        /* 0x00 */  HEADER(0x02, 0, 0x00),
 
         /* 0x01 */  PATTERN(0x03, 3),
         /* 0x02 */  PATTERN(0x06, 2),
@@ -87,7 +87,7 @@ TEST_CASE_METHOD(Fixture, "Multi pattern stop", "[pattern-seq]")
         /* 0x04 */  NOTE(0x15, 1, 0x9),
         /* 0x05 */  NOTE(0x10, 0, 0xB),
 
-        // Patten 1
+        // Pattern 1
         /* 0x06 */  NOTE(0x08, 1, 0x1),
         /* 0x07 */  NOTE(0x04, 2, 0x2),
     };
@@ -105,7 +105,7 @@ TEST_CASE_METHOD(Fixture, "Multi pattern stop", "[pattern-seq]")
 TEST_CASE_METHOD(Fixture, "Single pattern repeat", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(1, 1, 0x00),
+        /* 0x00 */  HEADER(0x01, 1, 0x01),
         /* 0x01 */  PATTERN(0x02, 2),
 
         // Pattern 0
@@ -113,11 +113,48 @@ TEST_CASE_METHOD(Fixture, "Single pattern repeat", "[pattern-seq]")
         /* 0x03 */  NOTE(15, 1, 9),
     };
     memcpy(core.zz_memory, ROM, sizeof(ROM));
-    setupNoteStrobe(75);
+    setupNoteStrobe(100);
 
-    bench.tick(75);
+    bench.tick(100);
 
-    CHECK(allNotes(50) == Vector8({05, 15, 05, 15, 05, 15, 05}));
+    CHECK(allNotes(50) == Vector8({05, 15, 05, 15, 05, 15, 05, 15, 5, 15}));
+}
+
+TEST_CASE_METHOD(Fixture, "Multi pattern repeat", "[pattern-seq]")
+{
+    static uint16_t ROM[] = {
+        /* 0x00 */  HEADER(0x03, 1, 0x02),
+
+        /* 0x01 */  PATTERN(0x04, 3),
+        /* 0x02 */  PATTERN(0x07, 2),
+        /* 0x03 */  PATTERN(0x09, 1),
+
+        // Pattern 0
+        /* 0x04 */  NOTE(0x05, 2, 0x3),
+        /* 0x05 */  NOTE(0x15, 1, 0x9),
+        /* 0x06 */  NOTE(0x10, 0, 0xB),
+
+        // Pattern 1
+        /* 0x07 */  NOTE(0x08, 1, 0x1),
+        /* 0x08 */  NOTE(0x04, 2, 0x2),
+
+        // Pattern 2
+        /* 0x09 */  NOTE(0x03, 10, 0x4),
+    };
+    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    setupNoteStrobe(125);
+
+    bench.tick(125);
+
+    CHECK(allNotes(125) == Vector8({
+        0x05, 0x15, 0x10,
+        0x08, 0x04,
+        0x03,
+        0x08, 0x04,
+        0x03,
+        0x08, 0x04,
+        0x03,
+    }));
 }
 
 static void state_machine(void)
@@ -131,7 +168,7 @@ static void state_machine(void)
         /* 0x03 */  NOTE(0x15, 1, 0x9),
         /* 0x04 */  NOTE(0x10, 0, 0xB),
 
-        // Patten 1
+        // Pattern 1
         /* 0x05 */  NOTE(0x08, 1, 0x1),
         /* 0x06 */  NOTE(0x04, 2, 0x2),
     };

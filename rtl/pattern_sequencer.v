@@ -33,10 +33,10 @@ module pattern_sequencer (
 
   reg [7:0]   rom_addr;
 
-  reg [7:0]   order_addr, order_addr_nxt;
-  reg [4:0]   order_len, order_len_nxt;
+  reg [5:0]   order_addr, order_addr_nxt;
+  reg [5:0]   order_last_addr, order_last_addr_nxt;
   reg         order_repeat, order_repeat_nxt;
-  reg [4:0]   order_count, order_count_nxt;
+  reg [5:0]   order_repeat_addr, order_repeat_addr_nxt;
 
   reg [7:0]   pattern_addr, pattern_addr_nxt;
   reg [7:0]   pattern_len, pattern_len_nxt;
@@ -52,9 +52,9 @@ module pattern_sequencer (
     rom_addr = pattern_addr;
 
     order_addr_nxt = order_addr;
-    order_len_nxt = order_len;
+    order_last_addr_nxt = order_last_addr;
     order_repeat_nxt = order_repeat;
-    order_count_nxt = order_count;
+    order_repeat_addr_nxt = order_repeat_addr;
 
     pattern_addr_nxt = pattern_addr;
     pattern_len_nxt = pattern_len;
@@ -78,10 +78,10 @@ module pattern_sequencer (
       end
 
       STATE_READ_HEADER_DATA: begin
-        order_addr_nxt = 8'd01;
-        order_len_nxt = i_rom_data[12:8];
-        order_repeat_nxt = i_rom_data[13];
-        order_count_nxt = 1;
+        order_addr_nxt = 6'd01;
+        order_last_addr_nxt = i_rom_data[5:0];
+        order_repeat_addr_nxt = i_rom_data[11:6];
+        order_repeat_nxt = i_rom_data[12];
 
         state_nxt = STATE_OUTPUT_ORDER_ADDR;
       end
@@ -99,7 +99,7 @@ module pattern_sequencer (
       end
 
       STATE_OUTPUT_ORDER_ADDR: begin
-        rom_addr = order_addr;
+        rom_addr = {2'b00, order_addr};
 
         state_nxt = STATE_READ_ORDER_DATA;
       end
@@ -133,16 +133,15 @@ module pattern_sequencer (
 
           state_nxt = STATE_IDLE_IN_PATTERN;
         end else begin
-          if (order_count == order_len) begin
+          if (order_addr == order_last_addr) begin
             if (order_repeat) begin
-              order_addr_nxt = 8'h01;
+              order_addr_nxt = order_repeat_addr;
               state_nxt = STATE_IDLE;
             end else begin
               state_nxt = STATE_STOPPED;
             end
           end else begin
             order_addr_nxt = order_addr + 1;
-            order_count_nxt = order_count + 1;
 
             state_nxt = STATE_IDLE;
           end
@@ -150,7 +149,6 @@ module pattern_sequencer (
       end
 
       STATE_STOPPED: begin
-
         state_nxt = STATE_STOPPED;
       end
 
@@ -169,9 +167,9 @@ module pattern_sequencer (
       state <= state_nxt;
 
       order_addr <= order_addr_nxt;
-      order_len <= order_len_nxt;
+      order_last_addr <= order_last_addr_nxt;
+      order_repeat_addr <= order_repeat_addr_nxt;
       order_repeat <= order_repeat_nxt;
-      order_count <= order_count_nxt;
 
       pattern_addr <= pattern_addr_nxt;
       pattern_len <= pattern_len_nxt;

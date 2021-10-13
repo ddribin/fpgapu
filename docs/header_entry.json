@@ -4,16 +4,16 @@
     },
     "reg": [
         {
-            "bits": 8,
+            "bits": 6,
             "type": 2,
-            "name": "address (0-255)",
-            "attr": "destination of repeat"
+            "name": "last address (0-63)",
+            "attr": "address of last order"
         },
         {
-            "bits": 5,
+            "bits": 6,
             "type": 3,
-            "name": "length (0-31)",
-            "attr": "number of order entries"
+            "name": "repeat address (0-63)",
+            "attr": "if repeat = 1, destination of repeat"
         },
         {
             "bits": 1,
@@ -21,7 +21,7 @@
             "name": "repeat"
         },
         {
-            "bits": 2,
+            "bits": 3,
             "type": 1
         }
     ]
