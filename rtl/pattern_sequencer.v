@@ -30,7 +30,7 @@ module pattern_sequencer #(
 
   reg [7:0]   rom_addr;
 
-  reg [7:0]   order_addr;
+  reg [7:0]   order_addr, order_addr_nxt;
   reg [7:0]   pattern_addr, pattern_addr_nxt;
   reg [7:0]   pattern_len, pattern_len_nxt;
   reg [7:0]   pattern_count, pattern_count_nxt;
@@ -43,6 +43,8 @@ module pattern_sequencer #(
     state_nxt = state;
 
     rom_addr = 0;
+
+    order_addr_nxt = order_addr;
 
     pattern_addr_nxt = pattern_addr;
     pattern_len_nxt = pattern_len;
@@ -95,8 +97,17 @@ module pattern_sequencer #(
 
       STATE_OUTPUT_NOTE: begin
         if (pattern_count < pattern_len) begin
+          pattern_addr_nxt = pattern_addr + 1;
+          pattern_count_nxt = pattern_count + 1;
+
           state_nxt = STATE_IDLE_IN_PATTERN;
         end else begin
+          if (order_addr == 8'h01) begin
+            order_addr_nxt = 8'h00;
+          end else begin
+            order_addr_nxt = order_addr + 1;
+          end
+
           state_nxt = STATE_IDLE;
         end
       end
@@ -112,6 +123,8 @@ module pattern_sequencer #(
     end else begin
       state <= state_nxt;
 
+      order_addr <= order_addr_nxt;
+
       pattern_addr <= pattern_addr_nxt;
       pattern_len <= pattern_len_nxt;
       pattern_count <= pattern_count_nxt;
@@ -119,21 +132,6 @@ module pattern_sequencer #(
       note_pitch <= note_pitch_nxt;
       note_len <= note_len_nxt;
       note_instrument <= note_instrument_nxt;
-
-      case (state)
-        STATE_OUTPUT_NOTE: begin
-          if (state_nxt == STATE_IDLE_IN_PATTERN) begin
-            pattern_addr <= pattern_addr + 1;
-            pattern_count <= pattern_count + 1;
-          end else begin
-            if (order_addr == 8'h01) begin
-              order_addr <= 8'h00;
-            end else begin
-              order_addr <= order_addr + 1;
-            end
-          end
-        end
-      endcase
     end
   end
 
