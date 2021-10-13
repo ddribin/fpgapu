@@ -29,17 +29,24 @@ module pattern_sequencer #(
   reg [STATE_WIDTH-1:0]   state_nxt;
 
   reg [7:0]   order_addr;
-  reg [7:0]   pattern_addr;
-  reg [7:0]   pattern_len;
-  reg [7:0]   pattern_count;
-  reg         skip_order;
+  reg [7:0]   pattern_addr, pattern_addr_nxt;
+  reg [7:0]   pattern_len, pattern_len_nxt;
+  reg [7:0]   pattern_count, pattern_count_nxt;
 
-  reg [5:0]   note_pitch;
-  reg [4:0]   note_len;
-  reg [3:0]   note_instrument;
+  reg [5:0]   note_pitch, note_pitch_nxt;
+  reg [4:0]   note_len, note_len_nxt;
+  reg [3:0]   note_instrument, note_instrument_nxt;
 
   always @(*) begin
     state_nxt = state;
+
+    pattern_addr_nxt = pattern_addr;
+    pattern_len_nxt = pattern_len;
+    pattern_count_nxt = pattern_count;
+
+    note_pitch_nxt = note_pitch;
+    note_len_nxt = note_len;
+    note_instrument_nxt = note_instrument;
 
     case (state)
       STATE_IDLE: begin
@@ -59,6 +66,10 @@ module pattern_sequencer #(
       end
 
       STATE_READ_ORDER_DATA: begin
+        pattern_addr_nxt = i_rom_data[7:0];
+        pattern_len_nxt = i_rom_data[15:8];
+        pattern_count_nxt = 1;
+
         state_nxt = STATE_OUTPUT_PATTERN_ADDR;
       end
 
@@ -67,6 +78,10 @@ module pattern_sequencer #(
       end
 
       STATE_READ_PATTERN_DATA: begin
+        note_pitch_nxt = i_rom_data[5:0];
+        note_len_nxt = i_rom_data[10:6];
+        note_instrument_nxt = i_rom_data[14:11];
+
         state_nxt = STATE_OUTPUT_NOTE;
       end
 
@@ -89,19 +104,15 @@ module pattern_sequencer #(
     end else begin
       state <= state_nxt;
 
+      pattern_addr <= pattern_addr_nxt;
+      pattern_len <= pattern_len_nxt;
+      pattern_count <= pattern_count_nxt;
+
+      note_pitch <= note_pitch_nxt;
+      note_len <= note_len_nxt;
+      note_instrument <= note_instrument_nxt;
+
       case (state)
-        STATE_READ_ORDER_DATA: begin
-          pattern_addr <= i_rom_data[7:0];
-          pattern_len <= i_rom_data[15:8];
-          pattern_count <= 1;
-        end
-
-        STATE_READ_PATTERN_DATA: begin
-          note_pitch <= i_rom_data[5:0];
-          note_len <= i_rom_data[10:6];
-          note_instrument <= i_rom_data[14:11];
-        end
-
         STATE_OUTPUT_NOTE: begin
           if (state_nxt == STATE_IDLE_IN_PATTERN) begin
             pattern_addr <= pattern_addr + 1;
