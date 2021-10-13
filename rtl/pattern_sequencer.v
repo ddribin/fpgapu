@@ -1,7 +1,6 @@
 `default_nettype none
 
-module pattern_sequencer #(
-) (
+module pattern_sequencer (
   input wire                i_clk,
   input wire                i_rst,
 

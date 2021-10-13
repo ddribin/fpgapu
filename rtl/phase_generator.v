@@ -1,9 +1,6 @@
 `default_nettype none
 
-module phase_generator #(
-  parameter FREQ_HZ = 440,
-  parameter SAMPLE_HZ = 25_000_000
-) (
+module phase_generator (
   input wire          i_clk,
   input wire          i_rst,
   input wire [31:0]   i_phase_delta,
