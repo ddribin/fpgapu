@@ -50,6 +50,21 @@ struct PatternSequencerFixture : TestFixture<UUT>
             time += 10;
         }
     }
+
+    Vector8 allNotes(uint64_t endTime)
+    {
+        Vector8 allNotes;
+        Vector8 noteTimeline = o_note_pitch.timeline(endTime);
+        for (auto change : o_note_valid.changes()) {
+            uint64_t time = std::get<0>(change);
+            uint8_t value = std::get<1>(change);
+            if (value == 1) {
+                uint8_t note_at_time = noteTimeline[time];
+                allNotes.push_back(note_at_time);
+            }
+        }
+        return allNotes;
+    }
 };
 
 using Fixture = PatternSequencerFixture;
@@ -60,10 +75,11 @@ TEST_CASE_METHOD(Fixture, "Pattern sequencer initial outputs", "[pattern-seq]")
 
     bench.tick(75);
 
-    // CHECK(o_note_valid.changes() == ChangeVector8());
-    // CHECK(o_note_pitch.changes() == ChangeVector8());
-    // CHECK(o_note_len.changes() == ChangeVector8());
-    // CHECK(o_note_instrument.changes() == ChangeVector8());
+    CHECK(allNotes(75) == Vector8({
+        0x05, 0x15, 0x10,
+        0x08, 0x04,
+        0x05, 0x15
+    }));
 }
 
 static void state_machine(void)
