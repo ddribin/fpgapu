@@ -28,6 +28,8 @@ module pattern_sequencer #(
   reg [STATE_WIDTH-1:0]   state;
   reg [STATE_WIDTH-1:0]   state_nxt;
 
+  reg [7:0]   rom_addr;
+
   reg [7:0]   order_addr;
   reg [7:0]   pattern_addr, pattern_addr_nxt;
   reg [7:0]   pattern_len, pattern_len_nxt;
@@ -39,6 +41,8 @@ module pattern_sequencer #(
 
   always @(*) begin
     state_nxt = state;
+
+    rom_addr = 0;
 
     pattern_addr_nxt = pattern_addr;
     pattern_len_nxt = pattern_len;
@@ -62,6 +66,8 @@ module pattern_sequencer #(
       end
 
       STATE_OUTPUT_ORDER_ADDR: begin
+        rom_addr = order_addr;
+
         state_nxt = STATE_READ_ORDER_DATA;
       end
 
@@ -74,6 +80,8 @@ module pattern_sequencer #(
       end
 
       STATE_OUTPUT_PATTERN_ADDR: begin
+        rom_addr = pattern_addr;
+
         state_nxt = STATE_READ_PATTERN_DATA;
       end
 
@@ -129,15 +137,7 @@ module pattern_sequencer #(
     end
   end
 
-  always @(*) begin
-    o_rom_addr = 0;
-    if (state == STATE_OUTPUT_ORDER_ADDR) begin
-      o_rom_addr = order_addr;
-    end else if (state == STATE_OUTPUT_PATTERN_ADDR) begin
-      o_rom_addr = pattern_addr;
-    end
-  end
-
+  assign o_rom_addr = rom_addr;
   assign o_note_valid = (state == STATE_OUTPUT_NOTE);
   assign o_note_pitch = note_pitch;
   assign o_note_len = note_len;
