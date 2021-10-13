@@ -134,8 +134,12 @@ module pattern_sequencer (
           state_nxt = STATE_IDLE_IN_PATTERN;
         end else begin
           if (order_count == order_len) begin
-            order_addr_nxt = 8'h00;
-            state_nxt = STATE_STOPPED;
+            if (order_repeat) begin
+              order_addr_nxt = 8'h01;
+              state_nxt = STATE_IDLE;
+            end else begin
+              state_nxt = STATE_STOPPED;
+            end
           end else begin
             order_addr_nxt = order_addr + 1;
             order_count_nxt = order_count + 1;

@@ -59,7 +59,7 @@ using Fixture = PatternSequencerFixture;
 TEST_CASE_METHOD(Fixture, "Single pattern stop", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(1, 0, 0),
+        /* 0x00 */  HEADER(1, 0, 0x00),
         /* 0x01 */  PATTERN(0x02, 2),
 
         // Pattern 0
@@ -77,7 +77,7 @@ TEST_CASE_METHOD(Fixture, "Single pattern stop", "[pattern-seq]")
 TEST_CASE_METHOD(Fixture, "Multi pattern stop", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(2, 0, 0),
+        /* 0x00 */  HEADER(2, 0, 0x00),
 
         /* 0x01 */  PATTERN(0x03, 3),
         /* 0x02 */  PATTERN(0x06, 2),
@@ -100,6 +100,24 @@ TEST_CASE_METHOD(Fixture, "Multi pattern stop", "[pattern-seq]")
         0x05, 0x15, 0x10,
         0x08, 0x04,
     }));
+}
+
+TEST_CASE_METHOD(Fixture, "Single pattern repeat", "[pattern-seq]")
+{
+    static uint16_t ROM[] = {
+        /* 0x00 */  HEADER(1, 1, 0x00),
+        /* 0x01 */  PATTERN(0x02, 2),
+
+        // Pattern 0
+        /* 0x02 */  NOTE(05, 2, 3),
+        /* 0x03 */  NOTE(15, 1, 9),
+    };
+    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    setupNoteStrobe(75);
+
+    bench.tick(75);
+
+    CHECK(allNotes(50) == Vector8({05, 15, 05, 15, 05, 15, 05}));
 }
 
 static void state_machine(void)
