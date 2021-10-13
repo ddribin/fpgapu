@@ -41,7 +41,7 @@ module pattern_sequencer (
   always @(*) begin
     state_nxt = state;
 
-    rom_addr = 0;
+    rom_addr = pattern_addr;
 
     order_addr_nxt = order_addr;
 
