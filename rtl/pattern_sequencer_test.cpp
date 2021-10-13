@@ -9,6 +9,7 @@ void setClock(Vpattern_sequencer_tb& core, uint8_t clock) {
 
 using UUT = Vpattern_sequencer_tb;
 
+#define HEADER(LEN, REPEAT, ADDR) (ADDR | (LEN << 8) | (REPEAT << 13))
 #define NOTE(NOTE, LEN, INSTRUMENT) (NOTE | (LEN << 6) | (INSTRUMENT << 11))
 #define PATTERN(NUMBER, LEN) (NUMBER | (LEN << 8))
 
@@ -26,20 +27,6 @@ struct PatternSequencerFixture : TestFixture<UUT>
         o_note_len(makeOutput(&UUT::o_note_len)),
         o_note_instrument(makeOutput(&UUT::o_note_instrument))
     {
-    static uint16_t ROM[] = {
-        /* 0x00 */  PATTERN(0x02, 3),
-        /* 0x01 */  PATTERN(0x05, 2),
-
-        // Pattern 0
-        /* 0x02 */  NOTE(0x05, 2, 0x3),
-        /* 0x03 */  NOTE(0x15, 1, 0x9),
-        /* 0x04 */  NOTE(0x10, 0, 0xB),
-
-        // Patten 1
-        /* 0x05 */  NOTE(0x08, 1, 0x1),
-        /* 0x06 */  NOTE(0x04, 2, 0x2),
-    };
-        memcpy(core.zz_memory, ROM, sizeof(ROM));
     }
 
     void setupNoteStrobe(uint64_t endTime)
@@ -69,8 +56,42 @@ struct PatternSequencerFixture : TestFixture<UUT>
 
 using Fixture = PatternSequencerFixture;
 
-TEST_CASE_METHOD(Fixture, "Pattern sequencer initial outputs", "[pattern-seq]")
+TEST_CASE_METHOD(Fixture, "Single pattern stop", "[pattern-seq]")
 {
+    static uint16_t ROM[] = {
+        /* 0x00 */  HEADER(1, 0, 0),
+        /* 0x01 */  PATTERN(0x02, 2),
+
+        // Pattern 0
+        /* 0x02 */  NOTE(05, 2, 3),
+        /* 0x03 */  NOTE(15, 1, 9),
+    };
+    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    setupNoteStrobe(50);
+
+    bench.tick(50);
+
+    CHECK(allNotes(50) == Vector8({05, 15}));
+}
+
+TEST_CASE_METHOD(Fixture, "Multi pattern stop", "[pattern-seq]")
+{
+    static uint16_t ROM[] = {
+        /* 0x00 */  HEADER(2, 0, 0),
+
+        /* 0x01 */  PATTERN(0x03, 3),
+        /* 0x02 */  PATTERN(0x06, 2),
+
+        // Pattern 0
+        /* 0x03 */  NOTE(0x05, 2, 0x3),
+        /* 0x04 */  NOTE(0x15, 1, 0x9),
+        /* 0x05 */  NOTE(0x10, 0, 0xB),
+
+        // Patten 1
+        /* 0x06 */  NOTE(0x08, 1, 0x1),
+        /* 0x07 */  NOTE(0x04, 2, 0x2),
+    };
+    memcpy(core.zz_memory, ROM, sizeof(ROM));
     setupNoteStrobe(75);
 
     bench.tick(75);
@@ -78,7 +99,6 @@ TEST_CASE_METHOD(Fixture, "Pattern sequencer initial outputs", "[pattern-seq]")
     CHECK(allNotes(75) == Vector8({
         0x05, 0x15, 0x10,
         0x08, 0x04,
-        0x05, 0x15
     }));
 }
 

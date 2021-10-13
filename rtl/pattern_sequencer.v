@@ -15,21 +15,29 @@ module pattern_sequencer (
   input wire  [15:0]        i_rom_data
 );
 
-  localparam STATE_IDLE                   = 0;
-  localparam STATE_OUTPUT_ORDER_ADDR      = 1;
-  localparam STATE_READ_ORDER_DATA        = 2;
-  localparam STATE_OUTPUT_PATTERN_ADDR    = 3;
-  localparam STATE_READ_PATTERN_DATA      = 4;
-  localparam STATE_OUTPUT_NOTE            = 5;
-  localparam STATE_IDLE_IN_PATTERN        = 6;
+  localparam STATE_INIT                   = 4'd0;
+  localparam STATE_OUTPUT_HEADER_ADDR     = 4'd10;
+  localparam STATE_READ_HEADER_DATA       = 4'd1;
+  localparam STATE_IDLE                   = 4'd2;
+  localparam STATE_OUTPUT_ORDER_ADDR      = 4'd3;
+  localparam STATE_READ_ORDER_DATA        = 4'd4;
+  localparam STATE_OUTPUT_PATTERN_ADDR    = 4'd5;
+  localparam STATE_READ_PATTERN_DATA      = 4'd6;
+  localparam STATE_OUTPUT_NOTE            = 4'd7;
+  localparam STATE_IDLE_IN_PATTERN        = 4'd8;
+  localparam STATE_STOPPED                = 4'd9;
 
-  localparam STATE_WIDTH = 3;
+  localparam STATE_WIDTH = 4;
   reg [STATE_WIDTH-1:0]   state;
   reg [STATE_WIDTH-1:0]   state_nxt;
 
   reg [7:0]   rom_addr;
 
   reg [7:0]   order_addr, order_addr_nxt;
+  reg [4:0]   order_len, order_len_nxt;
+  reg         order_repeat, order_repeat_nxt;
+  reg [4:0]   order_count, order_count_nxt;
+
   reg [7:0]   pattern_addr, pattern_addr_nxt;
   reg [7:0]   pattern_len, pattern_len_nxt;
   reg [7:0]   pattern_count, pattern_count_nxt;
@@ -44,6 +52,9 @@ module pattern_sequencer (
     rom_addr = pattern_addr;
 
     order_addr_nxt = order_addr;
+    order_len_nxt = order_len;
+    order_repeat_nxt = order_repeat;
+    order_count_nxt = order_count;
 
     pattern_addr_nxt = pattern_addr;
     pattern_len_nxt = pattern_len;
@@ -54,6 +65,27 @@ module pattern_sequencer (
     note_instrument_nxt = note_instrument;
 
     case (state)
+      STATE_INIT: begin
+        if (i_note_stb) begin
+          state_nxt = STATE_OUTPUT_HEADER_ADDR;
+        end
+      end
+
+      STATE_OUTPUT_HEADER_ADDR: begin
+        rom_addr = 8'd0;
+
+        state_nxt = STATE_READ_HEADER_DATA;
+      end
+
+      STATE_READ_HEADER_DATA: begin
+        order_addr_nxt = 8'd01;
+        order_len_nxt = i_rom_data[12:8];
+        order_repeat_nxt = i_rom_data[13];
+        order_count_nxt = 1;
+
+        state_nxt = STATE_OUTPUT_ORDER_ADDR;
+      end
+
       STATE_IDLE: begin
         if (i_note_stb) begin
           state_nxt = STATE_OUTPUT_ORDER_ADDR;
@@ -101,21 +133,31 @@ module pattern_sequencer (
 
           state_nxt = STATE_IDLE_IN_PATTERN;
         end else begin
-          if (order_addr == 8'h01) begin
+          if (order_count == order_len) begin
             order_addr_nxt = 8'h00;
+            state_nxt = STATE_STOPPED;
           end else begin
             order_addr_nxt = order_addr + 1;
-          end
+            order_count_nxt = order_count + 1;
 
-          state_nxt = STATE_IDLE;
+            state_nxt = STATE_IDLE;
+          end
         end
+      end
+
+      STATE_STOPPED: begin
+
+        state_nxt = STATE_STOPPED;
+      end
+
+      default: begin
       end
     endcase
   end
 
   always @(posedge i_clk) begin
     if (i_rst) begin
-      state <= STATE_IDLE;
+      state <= STATE_INIT;
       order_addr <= '0;
       pattern_addr <= '0;
       pattern_len <= '0;
@@ -123,6 +165,9 @@ module pattern_sequencer (
       state <= state_nxt;
 
       order_addr <= order_addr_nxt;
+      order_len <= order_len_nxt;
+      order_repeat <= order_repeat_nxt;
+      order_count <= order_count_nxt;
 
       pattern_addr <= pattern_addr_nxt;
       pattern_len <= pattern_len_nxt;
