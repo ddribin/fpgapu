@@ -10,6 +10,7 @@ verilate(${LIB_TARGET_NAME} SOURCES pwm_top.v)
 verilate(${LIB_TARGET_NAME} SOURCES timing_strobe_generator.v)
 verilate(${LIB_TARGET_NAME} SOURCES note_sequencer_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES pattern_sequencer_tb.v TRACE)
+verilate(${LIB_TARGET_NAME} SOURCES note_player_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES rom_sync_fake.v TRACE
     VERILATOR_ARGS -GWIDTH=16 -GDEPTH=17)
 
@@ -32,6 +33,7 @@ add_executable(${TEST_TARGET_NAME}
     pwm_test.cpp
     note_sequencer_test.cpp
     pattern_sequencer_test.cpp
+    note_player_test.cpp
     rom_sync_fake_test.cpp
     ../common/test-listener.cpp
     ../common/test-main.cpp
