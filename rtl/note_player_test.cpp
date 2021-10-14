@@ -34,6 +34,9 @@ struct NotePlayerFixture : TestFixture<UUT>
         rom[0x04] = 0x0002;     // Note 2
         rom[0x05] = 0xFFA5;
 
+        rom[0x81] = 0x1234;
+        rom[0x8E] = 0x5678;
+
         memcpy(core.zz_memory, rom, sizeof(rom));
     }
 

@@ -29,6 +29,8 @@ module note_player (
   localparam STATE_READ_PITCH_LOW_DATA      = 4'd3;
   localparam STATE_OUTPUT_PITCH_HIGH_ADDR   = 4'd4;
   localparam STATE_READ_PITCH_HIGH_DATA     = 4'd5;
+  localparam STATE_READ_INSTRUMENT_LENGTH   = 4'd7;
+  localparam STATE_READ_INSTRUMENT_VALUE    = 4'd8;
   localparam STATE_DONE                     = 4'd6;
 
 
@@ -42,8 +44,8 @@ module note_player (
   reg [7:0]   pitch_addr, pitch_addr_nxt;
   reg [7:0]   instrument_len_addr, instrument_len_addr_nxt;
   reg [7:0]   instrument_value_addr, instrument_value_addr_nxt;
-  reg [3:0]   instrument_value, instrument_value_nxt;
   reg [3:0]   instrument_len, instrument_len_nxt;
+  reg [3:0]   instrument_value, instrument_value_nxt;
   reg [3:0]   instrument_count, instrument_count_nxt;
 
   reg         done, done_nxt;
@@ -51,6 +53,12 @@ module note_player (
   reg [8:0]   envelope, envelope_nxt;
 
   reg [7:0]   rom_addr;
+
+  wire [3:0]  rom_data_nibbles[3:0];
+  assign rom_data_nibbles[0] = i_rom_data[3:0];
+  assign rom_data_nibbles[1] = i_rom_data[7:4];
+  assign rom_data_nibbles[2] = i_rom_data[11:8];
+  assign rom_data_nibbles[3] = i_rom_data[15:12];
 
   always @(*) begin
     state_nxt = state;
@@ -68,6 +76,8 @@ module note_player (
     pitch_addr_nxt = pitch_addr;
     instrument_len_addr_nxt = instrument_len_addr;
     instrument_value_addr_nxt = instrument_value_addr;
+    instrument_len_nxt = instrument_len;
+    instrument_value_nxt = instrument_value;
 
     case (state)
       STATE_IDLE: begin
@@ -106,6 +116,20 @@ module note_player (
 
       STATE_READ_PITCH_HIGH_DATA: begin
         phase_delta_nxt[31:16] = i_rom_data;
+        rom_addr = instrument_len_addr;
+
+        state_nxt = STATE_READ_INSTRUMENT_LENGTH;
+      end
+
+      STATE_READ_INSTRUMENT_LENGTH: begin
+        instrument_len_nxt = rom_data_nibbles[instrument[1:0]];
+        rom_addr = instrument_value_addr;
+
+        state_nxt = STATE_READ_INSTRUMENT_VALUE;
+      end
+
+      STATE_READ_INSTRUMENT_VALUE: begin
+        instrument_value_nxt = rom_data_nibbles[1];
         done_nxt = 1;
 
         state_nxt = STATE_DONE;
@@ -140,6 +164,8 @@ module note_player (
       pitch_addr <= pitch_addr_nxt;
       instrument_len_addr <= instrument_len_addr_nxt;
       instrument_value_addr <= instrument_value_addr_nxt;
+      instrument_len <= instrument_len_nxt;
+      instrument_value <= instrument_value_nxt;
     end
   end
 
