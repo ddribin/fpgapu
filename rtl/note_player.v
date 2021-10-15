@@ -4,7 +4,7 @@ module note_player (
   input wire                i_clk,
   input wire                i_rst,
 
-  input wire                i_tick,
+  input wire                i_frame_stb,
   input wire                i_load,
   input wire [5:0]          i_pitch,
   input wire [4:0]          i_duration,
@@ -24,6 +24,7 @@ module note_player (
   localparam  INSTRUMENT_VALUES_BASE      = 8'h84;
   
   localparam STATE_IDLE                     = 4'd0;
+  localparam STATE_PLAYING                  = 4'd9;
   localparam STATE_YIELD                    = 4'd1;
   localparam STATE_OUTPUT_PITCH_LOW_ADDR    = 4'd2;
   localparam STATE_READ_PITCH_LOW_DATA      = 4'd3;
@@ -78,25 +79,35 @@ module note_player (
     instrument_value_addr_nxt = instrument_value_addr;
     instrument_len_nxt = instrument_len;
     instrument_value_nxt = instrument_value;
+    instrument_count_nxt = instrument_count;
 
     case (state)
       STATE_IDLE: begin
-        if (i_tick) begin
+        if (i_frame_stb) begin
           pitch_nxt = i_pitch;
           duration_nxt = i_duration;
           instrument_nxt = i_instrument;
 
           pitch_addr_nxt = {1'b0, i_pitch, 1'b0};
-          instrument_len_addr_nxt = INSTRUMENT_LENGTHS_BASE + {6'h00,  i_instrument[3:2]};
-          instrument_value_addr_nxt = INSTRUMENT_VALUES_BASE + {2'b00, i_instrument, 1'b0};
+          instrument_len_addr_nxt = INSTRUMENT_LENGTHS_BASE + {6'b0,  i_instrument[3:2]};
+          instrument_value_addr_nxt = INSTRUMENT_VALUES_BASE + {1'b0, i_instrument, 2'b0};
+          instrument_count_nxt = 0;
 
           state_nxt = STATE_OUTPUT_PITCH_LOW_ADDR;
         end
       end
 
+      STATE_PLAYING: begin
+        if (i_frame_stb) begin
+          rom_addr = instrument_value_addr;
+
+          state_nxt = STATE_READ_INSTRUMENT_VALUE;
+        end
+      end
+
       STATE_OUTPUT_PITCH_LOW_ADDR: begin
-        rom_addr = pitch_addr;
-        pitch_addr_nxt = pitch_addr_nxt + 1;
+        rom_addr = pitch_addr + {4'b0000, instrument_count};
+        pitch_addr_nxt = pitch_addr + 1;
         
         state_nxt = STATE_READ_PITCH_LOW_DATA;
       end
@@ -137,8 +148,13 @@ module note_player (
 
       STATE_DONE: begin
         done_nxt = 0;
+        if (instrument_count == instrument_len) begin
+          state_nxt = STATE_IDLE;
+        end else begin
+          instrument_count_nxt = instrument_count + 1;
 
-        state_nxt = STATE_IDLE;
+          state_nxt = STATE_PLAYING;
+        end
       end
 
       default: begin
@@ -166,6 +182,7 @@ module note_player (
       instrument_value_addr <= instrument_value_addr_nxt;
       instrument_len <= instrument_len_nxt;
       instrument_value <= instrument_value_nxt;
+      instrument_count <= instrument_count_nxt;
     end
   end
 

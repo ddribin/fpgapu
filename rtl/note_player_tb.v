@@ -6,7 +6,7 @@ module note_player_tb #(
   input wire                i_clk,
   input wire                i_rst,
 
-  input wire                i_tick,
+  input wire                i_frame_stb,
   input wire                i_load,
   input wire [5:0]          i_pitch,
   input wire [4:0]          i_duration,

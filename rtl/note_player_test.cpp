@@ -11,12 +11,12 @@ using UUT = Vnote_player_tb;
 
 struct NotePlayerFixture : TestFixture<UUT>
 {
-    Input8 i_tick;
+    Input8 i_frame_stb;
     Input8 i_pitch, i_duration, i_instrument;
     Output32 o_phase_delta;
     NotePlayerFixture() :
-        // MakeInput(i_tick),
-        i_tick(makeInput(&UUT:: i_tick)),
+        // MakeInput(i_frame_stb),
+        i_frame_stb(makeInput(&UUT:: i_frame_stb)),
         i_pitch(makeInput(&UUT::i_pitch)),
         i_duration(makeInput(&UUT::i_duration)),
         i_instrument(makeInput(&UUT::i_instrument)),
@@ -34,17 +34,21 @@ struct NotePlayerFixture : TestFixture<UUT>
         rom[0x04] = 0x0002;     // Note 2
         rom[0x05] = 0xFFA5;
 
-        rom[0x81] = 0x1234;
-        rom[0x8E] = 0x5678;
+        rom[0x81] = 0x0123;     // Instrument 4-7 Lengths
+
+        rom[0x98] = 0x0123;     // Instrument 3 Envelope
+        rom[0x99] = 0x4567;
+        rom[0x9A] = 0x89AB;
+        rom[0x9B] = 0xCDEF;
 
         memcpy(core.zz_memory, rom, sizeof(rom));
     }
 
-    void setupNoteStrobe(uint64_t endTime)
+    void setupFrameStrobe(uint64_t endTime)
     {
         uint64_t time = 5;
         while (time < endTime) {
-            i_tick.addInputs({{time, 1}, {time+1, 0}});
+            i_frame_stb.addInputs({{time, 1}, {time+1, 0}});
             time += 10;
         }
     }
@@ -56,7 +60,7 @@ TEST_CASE_METHOD(Fixture, "Play one note", "[note-player]")
 {
     i_pitch.addInput({3, 2});
     i_instrument.addInput({3, 5});
-    setupNoteStrobe(75);
+    setupFrameStrobe(75);
 
     bench.tick(75);
 }
