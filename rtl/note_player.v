@@ -32,6 +32,7 @@ module note_player (
   localparam STATE_READ_PITCH_HIGH_DATA     = 4'd5;
   localparam STATE_READ_INSTRUMENT_LENGTH   = 4'd7;
   localparam STATE_READ_INSTRUMENT_VALUE    = 4'd8;
+  localparam STATE_OUTPUT_INSTRUMENT_VALUE_ADDR = 4'd10;
   localparam STATE_DONE                     = 4'd6;
 
 
@@ -56,10 +57,10 @@ module note_player (
   reg [7:0]   rom_addr;
 
   wire [3:0]  rom_data_nibbles[3:0];
-  assign rom_data_nibbles[0] = i_rom_data[3:0];
-  assign rom_data_nibbles[1] = i_rom_data[7:4];
-  assign rom_data_nibbles[2] = i_rom_data[11:8];
-  assign rom_data_nibbles[3] = i_rom_data[15:12];
+  assign rom_data_nibbles[3] = i_rom_data[3:0];
+  assign rom_data_nibbles[2] = i_rom_data[7:4];
+  assign rom_data_nibbles[1] = i_rom_data[11:8];
+  assign rom_data_nibbles[0] = i_rom_data[15:12];
 
   always @(*) begin
     state_nxt = state;
@@ -99,10 +100,16 @@ module note_player (
 
       STATE_PLAYING: begin
         if (i_frame_stb) begin
+          instrument_value_addr_nxt = INSTRUMENT_VALUES_BASE + {1'b0, i_instrument, 2'b0} + {4'b0, instrument_count >> 2};
+
+          state_nxt = STATE_OUTPUT_INSTRUMENT_VALUE_ADDR;
+        end
+      end
+
+      STATE_OUTPUT_INSTRUMENT_VALUE_ADDR: begin
           rom_addr = instrument_value_addr;
 
           state_nxt = STATE_READ_INSTRUMENT_VALUE;
-        end
       end
 
       STATE_OUTPUT_PITCH_LOW_ADDR: begin
@@ -140,7 +147,7 @@ module note_player (
       end
 
       STATE_READ_INSTRUMENT_VALUE: begin
-        instrument_value_nxt = rom_data_nibbles[1];
+        instrument_value_nxt = rom_data_nibbles[instrument_count[1:0]];
         done_nxt = 1;
 
         state_nxt = STATE_DONE;
@@ -148,9 +155,10 @@ module note_player (
 
       STATE_DONE: begin
         done_nxt = 0;
-        if (instrument_count == instrument_len) begin
+        if (duration == 0) begin
           state_nxt = STATE_IDLE;
         end else begin
+          duration_nxt = duration - 1;
           instrument_count_nxt = instrument_count + 1;
 
           state_nxt = STATE_PLAYING;
