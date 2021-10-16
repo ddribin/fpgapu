@@ -5,14 +5,16 @@ module note_player (
   input wire                i_rst,
 
   input wire                i_frame_stb,
+  input wire                i_note_stb,
   input wire                i_load,
   input wire [5:0]          i_pitch,
   input wire [4:0]          i_duration,
   input wire [3:0]          i_instrument,
 
-  output wire               o_done,
+  output wire               o_valid,
   output wire [31:0]        o_phase_delta,
   output wire [8:0]         o_envelope,
+  output wire               o_done,
 
   // ROM interaface
   output reg  [7:0]         o_rom_addr,
@@ -32,7 +34,7 @@ module note_player (
   localparam STATE_READ_ENVELOPE_LENGTH     = 4'd7;
   localparam STATE_OUTPUT_ENVELOPE_ADDR     = 4'd10;
   localparam STATE_READ_ENVELOPE_VALUE      = 4'd8;
-  localparam STATE_DONE                     = 4'd6;
+  localparam STATE_VALID                    = 4'd6;
 
 
   localparam STATE_WIDTH = 4;
@@ -41,6 +43,7 @@ module note_player (
   reg [5:0]   pitch, pitch_nxt;
   reg [4:0]   duration, duration_nxt;
   reg [3:0]   instrument, instrument_nxt;
+  reg         note_stb, note_stb_nxt;
 
   reg [7:0]   pitch_addr, pitch_addr_nxt;
   reg [7:0]   envelope_len_addr, envelope_len_addr_nxt;
@@ -49,6 +52,7 @@ module note_player (
   reg [3:0]   envelope_value, envelope_value_nxt;
   reg [3:0]   envelope_idx, envelope_idx_nxt;
 
+  reg         valid, valid_nxt;
   reg         done, done_nxt;
   reg [31:0]  phase_delta, phase_delta_nxt;
   reg [8:0]   envelope, envelope_nxt;
@@ -69,7 +73,9 @@ module note_player (
     pitch_nxt = pitch;
     duration_nxt = duration;
     instrument_nxt = instrument;
+    note_stb_nxt = note_stb;
 
+    valid_nxt = valid;
     done_nxt = done;
     phase_delta_nxt  = phase_delta;
     envelope_nxt = envelope;
@@ -83,10 +89,12 @@ module note_player (
 
     case (state)
       STATE_IDLE: begin
+        done_nxt = 0;
         if (i_frame_stb) begin
           pitch_nxt = i_pitch;
           duration_nxt = i_duration;
           instrument_nxt = i_instrument;
+          note_stb_nxt = i_note_stb;
 
           pitch_addr_nxt = {1'b0, i_pitch, 1'b0};
           envelope_len_addr_nxt = INSTRUMENT_LENGTHS_BASE + {6'b0,  i_instrument[3:2]};
@@ -99,6 +107,7 @@ module note_player (
 
       STATE_PLAYING: begin
         if (i_frame_stb) begin
+          note_stb_nxt = i_note_stb;
           envelope_addr_nxt = INSTRUMENT_VALUES_BASE + {1'b0, i_instrument, 2'b0} + {4'b0, envelope_idx >> 2};
 
           state_nxt = STATE_OUTPUT_ENVELOPE_ADDR;
@@ -147,20 +156,23 @@ module note_player (
 
       STATE_READ_ENVELOPE_VALUE: begin
         envelope_value_nxt = rom_data_nibbles[envelope_idx[1:0]];
-        done_nxt = 1;
+        valid_nxt = 1;
 
-        state_nxt = STATE_DONE;
+        state_nxt = STATE_VALID;
       end
 
-      STATE_DONE: begin
-        done_nxt = 0;
-        if (duration == 0) begin
-          state_nxt = STATE_IDLE;
-        end else begin
-          duration_nxt = duration - 1;
-          envelope_idx_nxt = envelope_idx + 1;
+      STATE_VALID: begin
+        valid_nxt = 0;
+        envelope_idx_nxt = envelope_idx + 1;
+        state_nxt = STATE_PLAYING;
 
-          state_nxt = STATE_PLAYING;
+        if (note_stb) begin
+          if (duration == 0) begin
+            done_nxt = 1;
+            state_nxt = STATE_IDLE;
+          end else begin
+            duration_nxt = duration - 1;
+          end
         end
       end
 
@@ -179,8 +191,10 @@ module note_player (
       pitch <= pitch_nxt;
       duration <= duration_nxt;
       instrument <= instrument_nxt;
+      note_stb <= note_stb_nxt;
 
       done <= done_nxt;
+      valid <= valid_nxt;
       phase_delta <= phase_delta_nxt;
       instrument <= instrument_nxt;
 
@@ -193,6 +207,7 @@ module note_player (
     end
   end
 
+  assign o_valid = valid;
   assign o_done = done;
   assign o_phase_delta = phase_delta;
   assign o_envelope = envelope;

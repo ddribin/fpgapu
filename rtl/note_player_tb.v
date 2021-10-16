@@ -7,14 +7,16 @@ module note_player_tb #(
   input wire                i_rst,
 
   input wire                i_frame_stb,
+  input wire                i_note_stb,
   input wire                i_load,
   input wire [5:0]          i_pitch,
   input wire [4:0]          i_duration,
   input wire [3:0]          i_instrument,
 
-  output wire               o_done,
+  output wire               o_valid,
   output wire [31:0]        o_phase_delta,
   output wire [8:0]         o_envelope,
+  output wire               o_done,
 
   output wire [7:0]         o_rom_addr,
   output wire [15:0]        i_rom_data,
