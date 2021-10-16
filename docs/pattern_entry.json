@@ -6,12 +6,12 @@
         {
             "bits": 6,
             "type": 2,
-            "name": "note pitch (0-63)"
+            "name": "pitch (0-63)"
         },
         {
             "bits": 5,
             "type": 3,
-            "name": "note length (0-31)"
+            "name": "duration (0-31)"
         },
         {
             "bits": 4,
