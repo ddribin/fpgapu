@@ -47,7 +47,7 @@ module note_player (
   reg [7:0]   envelope_addr, envelope_addr_nxt;
   reg [3:0]   envelope_len, envelope_len_nxt;
   reg [3:0]   envelope_value, envelope_value_nxt;
-  reg [3:0]   instrument_idx, instrument_idx_nxt;
+  reg [3:0]   envelope_idx, envelope_idx_nxt;
 
   reg         done, done_nxt;
   reg [31:0]  phase_delta, phase_delta_nxt;
@@ -79,7 +79,7 @@ module note_player (
     envelope_addr_nxt = envelope_addr;
     envelope_len_nxt = envelope_len;
     envelope_value_nxt = envelope_value;
-    instrument_idx_nxt = instrument_idx;
+    envelope_idx_nxt = envelope_idx;
 
     case (state)
       STATE_IDLE: begin
@@ -91,7 +91,7 @@ module note_player (
           pitch_addr_nxt = {1'b0, i_pitch, 1'b0};
           envelope_len_addr_nxt = INSTRUMENT_LENGTHS_BASE + {6'b0,  i_instrument[3:2]};
           envelope_addr_nxt = INSTRUMENT_VALUES_BASE + {1'b0, i_instrument, 2'b0};
-          instrument_idx_nxt = 0;
+          envelope_idx_nxt = 0;
 
           state_nxt = STATE_OUTPUT_PITCH_LOW_ADDR;
         end
@@ -99,7 +99,7 @@ module note_player (
 
       STATE_PLAYING: begin
         if (i_frame_stb) begin
-          envelope_addr_nxt = INSTRUMENT_VALUES_BASE + {1'b0, i_instrument, 2'b0} + {4'b0, instrument_idx >> 2};
+          envelope_addr_nxt = INSTRUMENT_VALUES_BASE + {1'b0, i_instrument, 2'b0} + {4'b0, envelope_idx >> 2};
 
           state_nxt = STATE_OUTPUT_ENVELOPE_ADDR;
         end
@@ -112,7 +112,7 @@ module note_player (
       end
 
       STATE_OUTPUT_PITCH_LOW_ADDR: begin
-        rom_addr = pitch_addr + {4'b0000, instrument_idx};
+        rom_addr = pitch_addr;
         pitch_addr_nxt = pitch_addr + 1;
         
         state_nxt = STATE_READ_PITCH_LOW_DATA;
@@ -146,7 +146,7 @@ module note_player (
       end
 
       STATE_READ_ENVELOPE_VALUE: begin
-        envelope_value_nxt = rom_data_nibbles[instrument_idx[1:0]];
+        envelope_value_nxt = rom_data_nibbles[envelope_idx[1:0]];
         done_nxt = 1;
 
         state_nxt = STATE_DONE;
@@ -158,7 +158,7 @@ module note_player (
           state_nxt = STATE_IDLE;
         end else begin
           duration_nxt = duration - 1;
-          instrument_idx_nxt = instrument_idx + 1;
+          envelope_idx_nxt = envelope_idx + 1;
 
           state_nxt = STATE_PLAYING;
         end
@@ -189,7 +189,7 @@ module note_player (
       envelope_addr <= envelope_addr_nxt;
       envelope_len <= envelope_len_nxt;
       envelope_value <= envelope_value_nxt;
-      instrument_idx <= instrument_idx_nxt;
+      envelope_idx <= envelope_idx_nxt;
     end
   end
 
