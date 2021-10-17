@@ -33,9 +33,8 @@ module duration_counter (
     case (state)
       STATE_STOPPED: begin
         // done_nxt = 0;
-        if (i_load) begin
+        if (i_enable && i_load) begin
           duration_nxt = i_duration;
-
           state_nxt = STATE_RUNNING;
         end
       end
