@@ -9,8 +9,10 @@ module channel_controller (
 
   output wire               o_pattern_enable,
   input wire                i_pattern_valid,
+
   output wire               o_pitch_lookup_enable,
   input wire                i_pitch_lookup_valid,
+  
   output wire               o_duration_enable
 );
   
