@@ -28,6 +28,11 @@ add_custom_target(${SDL_TARGET_NAME}-resources
 )
 add_dependencies(${SDL_TARGET_NAME} ${SDL_TARGET_NAME}-resources)
 
+set(CHANNEL_TEST_TARGET_NAME channel_test)
+add_executable(${CHANNEL_TEST_TARGET_NAME} channel_test_sdl_main.cpp)
+verilate(${CHANNEL_TEST_TARGET_NAME} SOURCES channel_test_sdl_top.v)
+target_link_libraries(${CHANNEL_TEST_TARGET_NAME} PRIVATE SDL2::Main)
+
 include(Catch)
 
 set(TEST_TARGET_NAME ${BASE_NAME}_tests)
