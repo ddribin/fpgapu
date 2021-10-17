@@ -92,4 +92,13 @@ module channel_test #(
     .i_rom_data(w_pattern_rom_data)
   );
 
+  duration_counter duration_counter (
+    .i_clk(i_clk),
+    .i_rst(i_rst),
+    .i_enable(w_duration_enable),
+    .i_load(0),
+    .i_duration(0),
+    .o_done()
+  );
+
 endmodule

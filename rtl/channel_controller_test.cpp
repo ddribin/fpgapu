@@ -12,9 +12,11 @@ using UUT = Vchannel_controller;
 
 struct ChannelControllerFixture : TestFixture<UUT>
 {
-    Input8 i_rst;
+    Input8 i_rst, i_tick_stb, i_note_stb;
     ChannelControllerFixture() :
-        MakeInput(i_rst)
+        MakeInput(i_rst),
+        MakeInput(i_tick_stb),
+        MakeInput(i_note_stb)
     {
     }
 
@@ -24,5 +26,11 @@ using Fixture = ChannelControllerFixture;
 
 TEST_CASE_METHOD(Fixture, "channel: Is not running when initialized", "[channel]")
 {
-    bench.tick(25);
+    i_tick_stb.addInputs({
+        {4,  1}, {5,  0}, {9,  1}, {10, 0}, {14, 1}, {15, 0}, {19, 1}, {20, 0},
+        {24, 1}, {25, 0},
+    });
+    i_note_stb.addInputs({ {4, 1}, {5, 0}, {24, 1}, {25, 0}, });
+
+    bench.tick(30);
 }
