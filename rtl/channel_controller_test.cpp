@@ -13,11 +13,24 @@ using UUT = Vchannel_controller;
 struct ChannelControllerFixture : TestFixture<UUT>
 {
     Input8 i_rst, i_tick_stb, i_note_stb;
+    Input8 i_pattern_valid, i_pitch_lookup_valid;
     ChannelControllerFixture() :
         MakeInput(i_rst),
         MakeInput(i_tick_stb),
-        MakeInput(i_note_stb)
+        MakeInput(i_note_stb),
+        MakeInput(i_pattern_valid),
+        MakeInput(i_pitch_lookup_valid)
     {
+    }
+
+    template<class Input>
+    void setupPeriodicPulse(Input &input, uint64_t startTime, uint64_t endTime, uint64_t period)
+    {
+        uint64_t time = startTime;
+        while (time < endTime) {
+            input.addInputs({{time, 1}, {time+1, 0}});
+            time += period;
+        }
     }
 
 };
@@ -26,11 +39,10 @@ using Fixture = ChannelControllerFixture;
 
 TEST_CASE_METHOD(Fixture, "channel: Is not running when initialized", "[channel]")
 {
-    i_tick_stb.addInputs({
-        {4,  1}, {5,  0}, {9,  1}, {10, 0}, {14, 1}, {15, 0}, {19, 1}, {20, 0},
-        {24, 1}, {25, 0},
-    });
-    i_note_stb.addInputs({ {4, 1}, {5, 0}, {24, 1}, {25, 0}, });
+    setupPeriodicPulse(i_tick_stb, 5, 100, 10);
+    setupPeriodicPulse(i_note_stb, 5, 100, 20);
+    i_pattern_valid.addInputs({ {7, 1}, {8, 0} });
+    i_pitch_lookup_valid.addInputs({ {9, 1}, {10, 0} });
 
-    bench.tick(30);
+    bench.tick(100);
 }

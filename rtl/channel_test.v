@@ -47,19 +47,38 @@ module channel_test #(
 
   wire w_pattern_enable;
   wire w_pattern_valid;
+
   wire w_pitch_lookup_enable;
   wire w_pitch_lookup_valid;
+
   wire w_duration_enable;
+  wire w_duration_load;
+  wire w_duration_running;
+
+  wire w_envelope_enable;
+  wire w_envelope_load;
+
+  wire w_envelope_enable;
+  wire w_envelope_load;
+
   channel_controller channel_controller (
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_note_stb(w_note_stb),
     .i_tick_stb(w_tick_stb),
+
     .o_pattern_enable(w_pattern_enable),
     .i_pattern_valid(w_pattern_valid),
+
     .o_pitch_lookup_enable(w_pitch_lookup_enable),
     .i_pitch_lookup_valid(w_pitch_lookup_valid),
-    .o_duration_enable(w_duration_enable)
+
+    .o_duration_enable(w_duration_enable),
+    .o_duration_load(w_duration_load),
+    .i_duration_running(w_duration_running),
+
+    .o_envelope_enable(w_envelope_enable),
+    .o_envelope_load(w_envelope_load)
   );
 
   wire [5:0]  w_pitch;
@@ -96,9 +115,10 @@ module channel_test #(
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_enable(w_duration_enable),
-    .i_load(0),
+    .i_load(w_duration_load),
     .i_duration(0),
-    .o_done()
+    .o_done(),
+    .o_running(w_duration_running)
   );
 
 endmodule
