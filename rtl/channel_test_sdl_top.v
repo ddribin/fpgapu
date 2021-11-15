@@ -1,8 +1,16 @@
 `default_nettype none
 
-module fpgapu_sdl_top (
+module channel_test_sdl_top #(
+  parameter FOO = "foo"
+) (
   input wire        i_clk,
   input wire        i_rst,
+
+  output wire         o_pattern_enable,
+  output wire [5:0]   o_pitch,
+  output wire [4:0]   o_duration,
+  output wire [3:0]   o_instrument,
+
   input wire  [3:0] i_mixer,
   output wire [7:0] o_audio_sample
 );
@@ -17,10 +25,16 @@ module fpgapu_sdl_top (
   wire [8:0] w_audio_sample;
   channel_test #(
     .CLOCK_FREQ(1_000_000),
-    .NOTE_TABLE_FILE("resources/note_table_1MHz.txt")
+    .NOTE_TABLE_FILE("resources/note_table_1MHz_full.txt"),
+    .PATTERN_FILE("resources/song_scale_rom.txt")
   ) channel_test (
     .i_clk(i_clk),
     .i_rst(w_rst),
+    .o_pattern_enable(o_pattern_enable),
+    .o_pitch(o_pitch),
+    .o_duration(o_duration),
+    .o_instrument(o_instrument),
+    .o_sample_valid(),
     .o_sample(w_audio_sample)
   );
 

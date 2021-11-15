@@ -3,8 +3,49 @@
 #include <verilated.h>
 #include "Vchannel_test_sdl_top.h"
 
-using TopModule = Vchannel_test_sdl_top;
+using TopModuleBase = Vchannel_test_sdl_top;
+// using TopModule = Vchannel_test_sdl_top;
 
+
+#define TOPVAR(A)     channel_test_sdl_top__DOT__ ## A
+
+#define	CHTESTVAR(A)   TOPVAR(channel_test__DOT__ ## A)
+
+#define	CHCTRLVAR(A)   CHTESTVAR(channel_controller__DOT__ ## A)
+
+#define chctrl_state    CHCTRLVAR(state)
+#define chctrl_pattern_enable     CHCTRLVAR(pattern_enable)
+
+#define	SEQVAR(A)   CHTESTVAR(pattern_sequencer__DOT__ ## A)
+// #define seq_state   SEQVAR(state)
+#define seq_note_pitch SEQVAR(note_pitch)
+#define seq_note_len SEQVAR(note_len)
+#define seq_note_instrument SEQVAR(note_instrument)
+// #define seq_rom_addr SEQVAR(rom_addr)
+#define seq_pattern_addr SEQVAR(pattern_addr)
+#define seq_pattern_addr_nxt SEQVAR(pattern_addr_nxt)
+
+// #define pattern_rom_mem CHTESTVAR(pattern_rom__DOT__memory)
+
+class TopModule : public TopModuleBase {
+    public:
+    using TopModuleBase::TopModuleBase;
+    
+    CData seq_state() const { return SEQVAR(state); }
+    CData seq_rom_addr() const { return SEQVAR(rom_addr); }
+
+    const SData* pattern_rom_mem() const { return CHTESTVAR(pattern_rom__DOT__memory); }
+};
+
+// Called by $time in Verilog
+// converts to double, to match
+// what SystemC does
+double sc_time_stamp (void)
+{
+    return 0;
+}
+
+static VerilatedContext * context = 0;
 static TopModule * top = 0;
 static const uint64_t SAMPLE_FREQ = 441000;  // 44.1 kHz
 static const uint64_t CLOCK_FREQ = 1000000;  // 1 MHz
@@ -18,14 +59,46 @@ void run_one_tick(void)
 {
     top->i_clk = 1;
     top->eval();
+    context->timeInc(5);
     top->i_clk = 0;
     top->eval();
+    context->timeInc(5);
 }
 
 void run_until_wrap(void)
 {
     while (1) {
         run_one_tick();
+
+#if 0
+        if (top->o_pattern_enable) {
+            printf("%lu: Note: %d %d %d\n", context->time(), top->o_pitch, top->o_duration, top->o_instrument);
+            printf("Channel State: %d\n", top->chctrl_state);
+        }
+#endif
+        int seq_state = top->seq_state();
+        if ((seq_state != 0) && (seq_state != 1) && (seq_state != 6)) {
+            printf("Sequencer state: %d rom_addr: 0x%02x 0x%04x 0x%02x 0x%02x\n",
+                seq_state, top->seq_rom_addr(), top->pattern_rom_mem()[top->seq_rom_addr()], top->seq_pattern_addr_nxt, top->seq_pattern_addr);
+        }
+#if 0
+        if (seq_state == 2) {
+            printf("Sequencer state: %d header addr: 0x%x\n",
+                seq_state, top->seq_rom_addr);
+        } else
+        if (seq_state == 4) {
+            printf("Sequencer state: %d order addr: 0x%x\n",
+                seq_state, top->seq_rom_addr);
+        } else
+        if (seq_state == 7) {
+            printf("Sequencer state: %d pattern addr: 0x%x\n",
+                seq_state, top->seq_rom_addr);
+        } else
+        if (seq_state == 9) {
+            printf("Sequencer state: %d note_pitch: 0x%x, note_len: %d, note_instrument: %d\n",
+                top->seq_state, top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument);
+        }
+#endif
 
         counter += callback_delta;
         bool wrap = (counter >> COUNTER_WIDTH) != 0;
@@ -105,7 +178,8 @@ int main(int argc, char* argv[])
     // These are accessed in the audio callback, which is a separate thread, so need to lock it.
     // Probably not needed since the device is still paused, but this ensures proper memory barriers.
     SDL_LockAudioDevice(id);
-    top = new TopModule();
+    context = new VerilatedContext();
+    top = new TopModule(context);
     top->i_clk = 0;
     top->eval();
 

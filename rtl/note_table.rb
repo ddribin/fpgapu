@@ -28,6 +28,7 @@ NOTES = [
   ["E4",  329.6276],
   ["F4",  349.2282],
   ["Fs4", 369.9944],
+  ["G4",  391.9954],
   ["Gs4", 415.3047],
   ["A4",  440.0000],
   ["As4", 466.1638],
@@ -62,7 +63,9 @@ NOISE = [
   ["A", 4709.9],
   ["F", 440.0],
 ]
-SAMPLE_HZ = 25_000_000
+
+# SAMPLE_HZ = 25_000_000
+SAMPLE_HZ = 1_000_000
 BPM = 180
 
 COMMAND = File.basename($0)
@@ -95,7 +98,7 @@ def freq_to_count(freq_hz)
   return count
 end
 
-def print_note_table
+def print_note_table_32
   i = 0
   NOTES.each do |note|
     if note.count == 0
@@ -106,18 +109,46 @@ def print_note_table
     name = note[0]
     freq_hz = note[1]
     count = freq_to_count(freq_hz)
-    printf "%08X  // %-3s %11.5f Hz\n", count, name, freq_hz
+    printf "%08X  // [0x%02X] %-3s %11.5f Hz\n", count, i,name, freq_hz
     i += 1
   end
 
   separator = "\n"
   while i < 64
-    puts "#{separator}00000000"
+    printf "%s00000000  // [0x%02X]\n", separator, i
     separator = ""
     i += 1
   end
 end
 
+def print_note_table_16
+  i = 0
+  NOTES.each do |note|
+    if note.count == 0
+      puts
+      next
+    end
+
+    name = note[0]
+    freq_hz = note[1]
+    count = freq_to_count(freq_hz)
+
+    count_lo = count & 0xFFFF
+    printf "%04X  // [0x%02X] %-3s %11.5f Hz\n", count_lo, i, name, freq_hz
+    i += 1
+
+    count_hi = (count & 0xFFFF_0000) >> 16
+    printf "%04X  // [0x%02X]\n", count_hi, i
+    i += 1
+  end
+
+  separator = "\n"
+  while i < 256
+    printf "%s0000  // [0x%02X]\n", separator, i
+    separator = ""
+    i += 1
+  end
+end
 def print_duration_table
   tick_per_sec = 60
   ticks_per_min = 60*tick_per_sec
@@ -252,6 +283,8 @@ when "defines"
   print_note_defines
 when "table"
   print_note_table
+when "table16"
+  print_note_table_16
 when "duration"
   print_duration_table
 when "vibrato"

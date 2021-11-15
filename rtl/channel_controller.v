@@ -43,6 +43,7 @@ module channel_controller (
   localparam STATE_ENABLE_PITCH_LOOKUP  = 4'd5;
   localparam STATE_WAIT_PITCH_LOOKUP    = 4'd6;
   localparam STATE_LOAD_DURATION        = 4'd7;
+  localparam STATE_ENABLE_DURATION      = 4'd8;
 
   localparam STATE_CONTINUE_NOTE        = 4'd1;
 
@@ -75,6 +76,12 @@ module channel_controller (
 
       STATE_CONTINUE_NOTE: begin
         if (i_tick_stb && i_note_stb) begin
+          if (i_duration_running) begin
+            state_nxt = STATE_START_NOTE;
+          end else begin
+            state_nxt = STATE_START_NOTE;
+          end
+        end else if (i_tick_stb && !i_note_stb) begin
 
         end
       end
@@ -108,6 +115,11 @@ module channel_controller (
       STATE_LOAD_DURATION: begin
         duration_enable = 1'b1;
         duration_load = 1'b1;
+        state_nxt = STATE_CONTINUE_NOTE;
+      end
+
+      STATE_ENABLE_DURATION: begin
+        duration_enable = 1'b1;
         state_nxt = STATE_CONTINUE_NOTE;
       end
 

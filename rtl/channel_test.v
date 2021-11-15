@@ -7,6 +7,13 @@ module channel_test #(
 ) (
   input wire          i_clk,
   input wire          i_rst,
+
+  output wire         o_pattern_enable,
+  output wire [5:0]   o_pitch,
+  output wire [4:0]   o_duration,
+  output wire [3:0]   o_instrument,
+
+  output wire         o_sample_valid,
   output wire [8:0]   o_sample
 );
 
@@ -94,8 +101,8 @@ module channel_test #(
     .o_note_instrument(w_instrument),
     .o_note_valid(w_pattern_valid),
 
-    .o_rom_addr(w_note_rom_addr),
-    .i_rom_data(w_note_rom_data)
+    .o_rom_addr(w_pattern_rom_addr),
+    .i_rom_data(w_pattern_rom_data)
   );
 
   pitch_lookup pitch_lookup (
@@ -107,8 +114,8 @@ module channel_test #(
     .o_phase_delta(),
     .o_valid(w_pitch_lookup_valid),
 
-    .o_rom_addr(w_pattern_rom_addr),
-    .i_rom_data(w_pattern_rom_data)
+    .o_rom_addr(w_note_rom_addr),
+    .i_rom_data(w_note_rom_data)
   );
 
   duration_counter duration_counter (
@@ -120,5 +127,10 @@ module channel_test #(
     .o_done(),
     .o_running(w_duration_running)
   );
+
+  assign o_pattern_enable = w_pattern_enable;
+  assign o_pitch = w_pitch;
+  assign o_duration = w_duration;
+  assign o_instrument = w_instrument;
 
 endmodule

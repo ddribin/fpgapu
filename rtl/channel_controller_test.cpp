@@ -8,7 +8,7 @@ void setClock(Vchannel_controller& core, uint8_t clock) {
 using UUT = Vchannel_controller;
 
 #define MakeInput(_I_) _I_(makeInput(&UUT:: _I_))
-#define MakeOutput(_I_) _I_(makeOutput(&UUT:: _I_))
+#define MakeOutput(_O_) _O_(makeOutput(&UUT:: _O_))
 
 struct ChannelControllerFixture : TestFixture<UUT>
 {

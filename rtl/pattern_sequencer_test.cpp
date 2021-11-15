@@ -156,3 +156,44 @@ TEST_CASE_METHOD(Fixture, "pattern: Multi pattern repeat", "[pattern-seq]")
         0x03,
     }));
 }
+
+TEST_CASE_METHOD(Fixture, "pattern: Scale song", "[pattern-seq]")
+{
+    static uint16_t ROM[] = {
+        /* 0x00 */  0x1000,
+        /* 0x01 */  0x0802,
+        /* 0x02 */  0x00CC,
+        /* 0x03 */  0x00CE,
+        /* 0x04 */  0x00D0,
+        /* 0x05 */  0x00D1,
+        /* 0x06 */  0x00D3,
+        /* 0x07 */  0x00D5,
+        /* 0x08 */  0x00D7,
+        /* 0x09 */  0x00D8,
+    };
+    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    setupNoteStrobe(250);
+
+    bench.tick(250);
+}
+
+TEST_CASE_METHOD(Fixture, "pattern: Scale song 2", "[pattern-seq]")
+{
+    static uint16_t ROM[] = {
+        /* 0x00 */  HEADER(0x01, 1, 0x01),
+        /* 0x01 */  PATTERN(0x02, 8),
+
+        /* 0x02 */  NOTE(0x18, 4, 0),
+        /* 0x03 */  NOTE(0x1C, 4, 0),
+        /* 0x04 */  NOTE(0x20, 4, 0),
+        /* 0x05 */  NOTE(0x22, 4, 0),
+        /* 0x06 */  NOTE(0x18, 4, 0),
+        /* 0x07 */  NOTE(0x18, 4, 0),
+        /* 0x08 */  NOTE(0x18, 4, 0),
+        /* 0x09 */  NOTE(0x18, 4, 0),
+    };
+    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    setupNoteStrobe(250);
+
+    bench.tick(250);
+}
