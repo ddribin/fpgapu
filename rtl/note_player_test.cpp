@@ -7,8 +7,6 @@ void setClock(Vnote_player_tb& core, uint8_t clock) {
 
 using UUT = Vnote_player_tb;
 
-#define MakeInput(_I_) #_I_(makeInput(&UUT:: #_I_))
-
 struct NotePlayerFixture : TestFixture<UUT>
 {
     Input8 i_frame_stb, i_note_stb;

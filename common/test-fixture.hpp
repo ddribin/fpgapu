@@ -11,4 +11,7 @@ struct TestFixture : TestFixtureBase<Core> {
     }
 };
 
+#define MakeInput(_I_) _I_(makeInput(&UUT::_I_))
+#define MakeOutput(_O_) _O_(makeOutput(&UUT::_O_))
+
 #endif

@@ -7,9 +7,6 @@ void setClock(Vpitch_lookup_tb& core, uint8_t clock) {
 
 using UUT = Vpitch_lookup_tb;
 
-#define MakeInput(_I_) _I_(makeInput(&UUT:: _I_))
-#define MakeOutput(_O_) _O_(makeOutput(&UUT:: _O_))
-
 struct PitchLookupFixture : TestFixture<UUT>
 {
     Input8 i_rst, i_enable, i_pitch;

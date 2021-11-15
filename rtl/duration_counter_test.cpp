@@ -7,9 +7,6 @@ void setClock(Vduration_counter& core, uint8_t clock) {
 
 using UUT = Vduration_counter;
 
-#define MakeInput(_I_) _I_(makeInput(&UUT:: _I_))
-#define MakeOutput(_O_) _O_(makeOutput(&UUT:: _O_))
-
 struct DurationCounterFixture : TestFixture<UUT>
 {
     Input8 i_rst, i_enable, i_load, i_duration;
