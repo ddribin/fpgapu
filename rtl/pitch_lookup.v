@@ -26,6 +26,7 @@ module pitch_lookup (
 
   reg [5:0]   pitch, pitch_nxt;
   reg [7:0]   pitch_addr, pitch_addr_nxt;
+  reg [15:0]  phase_delta_lo, phase_delta_lo_nxt;
   reg [31:0]  phase_delta, phase_delta_nxt;
   reg         valid, valid_nxt;
 
@@ -38,6 +39,7 @@ module pitch_lookup (
 
     pitch_nxt = pitch;
     pitch_addr_nxt = pitch_addr;
+    phase_delta_lo_nxt = phase_delta_lo;
     phase_delta_nxt  = phase_delta;
     valid_nxt = valid;
 
@@ -60,13 +62,14 @@ module pitch_lookup (
       end
 
       STATE_READ_PITCH_LOW_DATA: begin
-        phase_delta_nxt[15:0] = i_rom_data;
+        phase_delta_lo_nxt = i_rom_data;
         rom_addr = pitch_addr;
 
         state_nxt = STATE_READ_PITCH_HIGH_DATA;
       end
 
       STATE_READ_PITCH_HIGH_DATA: begin
+        phase_delta_nxt[15:0] = phase_delta_lo;
         phase_delta_nxt[31:16] = i_rom_data;
         valid_nxt = 1;
 
@@ -93,6 +96,7 @@ module pitch_lookup (
 
       pitch <= pitch_nxt;
       pitch_addr <= pitch_addr_nxt;
+      phase_delta_lo <= phase_delta_lo_nxt;
       phase_delta <= phase_delta_nxt;
       valid <= valid_nxt;
     end

@@ -26,10 +26,10 @@ struct PitchLookupFixture : TestFixture<UUT>
         rom[0x01] = 0xFFA5;
 
         rom[0x02] = 0x0001;     // Pitch 1
-        rom[0x03] = 0xFFA5;
+        rom[0x03] = 0xFFA4;
 
         rom[0x04] = 0x0002;     // Pitch 2
-        rom[0x05] = 0xFFA5;
+        rom[0x05] = 0xFFA3;
 
         memcpy(core.memory, rom, sizeof(rom));
     }
@@ -65,7 +65,7 @@ TEST_CASE_METHOD(Fixture, "pitch: Lookup second note", "[pitch]")
     bench.tick(10);
 
     CHECK(o_valid.changes() == ChangeVector8({ {8, 1}, {9, 0} }));
-    CHECK(o_phase_delta.timeline(10)[8] == 0xFFA50001);
+    CHECK(o_phase_delta.changes() == ChangeVector32({ {8, 0xFFA40001} }));
 }
 
 TEST_CASE_METHOD(Fixture, "pitch: Lookup three notes", "[pitch]")
@@ -84,10 +84,9 @@ TEST_CASE_METHOD(Fixture, "pitch: Lookup three notes", "[pitch]")
         {13, 1}, {14, 0},
         {18, 1}, {19, 0},
     }));
-    Vector32 o_phase_delta_timeline = o_phase_delta.timeline(20);
-    CHECK(o_phase_delta_timeline[8]  == 0xFFA50001);
-    CHECK(o_phase_delta_timeline[13] == 0xFFA50000);
-    CHECK(o_phase_delta_timeline[18] == 0xFFA50002);
+    CHECK(o_phase_delta.changes() == ChangeVector32({
+        {8, 0xFFA40001}, {13, 0xFFA50000}, {18, 0xFFA30002},
+    }));
 }
 
 TEST_CASE_METHOD(Fixture, "pitch: Handles reset", "[pitch]")
