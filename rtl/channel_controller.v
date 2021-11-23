@@ -18,7 +18,9 @@ module channel_controller (
   input wire                i_duration_running,
 
   output wire               o_envelope_enable,
-  output wire               o_envelope_load
+  output wire               o_envelope_load,
+
+  output wire               o_valid
 );
 
   // To start playing a new note:
@@ -44,11 +46,14 @@ module channel_controller (
   localparam STATE_WAIT_PITCH_LOOKUP    = 4'd6;
   localparam STATE_LOAD_DURATION        = 4'd7;
   localparam STATE_ENABLE_DURATION      = 4'd8;
+  localparam STATE_VALID                = 4'd9;
 
   localparam STATE_CONTINUE_NOTE        = 4'd1;
 
   localparam STATE_WIDTH = 4;
   reg [STATE_WIDTH-1:0]   state, state_nxt;
+
+  reg valid, valid_nxt;
 
   reg pattern_enable;
   reg pitch_lookup_enable;
@@ -59,6 +64,7 @@ module channel_controller (
   
   always @(*) begin
     state_nxt = state;
+    valid_nxt = valid;
 
     pattern_enable = 1'b0;
     pitch_lookup_enable = 1'b0;
@@ -108,7 +114,9 @@ module channel_controller (
 
       STATE_WAIT_PITCH_LOOKUP: begin
         if (i_pitch_lookup_valid) begin
-          state_nxt = STATE_LOAD_DURATION;
+          // state_nxt = STATE_LOAD_DURATION;
+          state_nxt = STATE_VALID;
+          valid_nxt = 1'b1;
         end
       end
 
@@ -123,6 +131,11 @@ module channel_controller (
         state_nxt = STATE_CONTINUE_NOTE;
       end
 
+      STATE_VALID: begin
+        valid_nxt = 1'b0;
+        state_nxt = STATE_START_NOTE;
+      end
+
       default: begin
         state_nxt = STATE_START_NOTE;
       end
@@ -132,11 +145,14 @@ module channel_controller (
   always @(posedge i_clk) begin
     if (i_rst) begin
       state <= STATE_START_NOTE;
+      valid <= 1'b0;
     end else begin
       state <= state_nxt;
+      valid <= valid_nxt;
     end
   end
 
+  assign o_valid = valid;
   assign o_pattern_enable = pattern_enable;
   assign o_pitch_lookup_enable = pitch_lookup_enable;
   assign o_duration_enable = duration_enable;

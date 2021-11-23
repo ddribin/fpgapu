@@ -12,6 +12,8 @@ module channel_test_sdl_top #(
   output wire [3:0]   o_instrument,
 
   input wire  [3:0] i_mixer,
+  output wire         o_sample_valid,
+  output wire [31:0]  o_phase,
   output wire [7:0] o_audio_sample
 );
 
@@ -34,7 +36,8 @@ module channel_test_sdl_top #(
     .o_pitch(o_pitch),
     .o_duration(o_duration),
     .o_instrument(o_instrument),
-    .o_sample_valid(),
+    .o_sample_valid(o_sample_valid),
+    .o_phase(o_phase),
     .o_sample(w_audio_sample)
   );
 

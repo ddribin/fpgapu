@@ -13,7 +13,7 @@ using TopModuleBase = Vchannel_test_sdl_top;
 
 #define	CHCTRLVAR(A)   CHTESTVAR(channel_controller__DOT__ ## A)
 
-#define chctrl_state    CHCTRLVAR(state)
+// #define chctrl_state    CHCTRLVAR(state)
 #define chctrl_pattern_enable     CHCTRLVAR(pattern_enable)
 
 #define	SEQVAR(A)   CHTESTVAR(pattern_sequencer__DOT__ ## A)
@@ -30,7 +30,9 @@ using TopModuleBase = Vchannel_test_sdl_top;
 class TopModule : public TopModuleBase {
     public:
     using TopModuleBase::TopModuleBase;
-    
+
+    uint8_t chctrl_state() const { return CHCTRLVAR(state); }
+
     CData seq_state() const { return SEQVAR(state); }
     CData seq_rom_addr() const { return SEQVAR(rom_addr); }
 
@@ -65,6 +67,10 @@ void run_one_tick(void)
     context->timeInc(5);
 }
 
+void nop(void) {
+
+}
+
 void run_until_wrap(void)
 {
     while (1) {
@@ -77,10 +83,17 @@ void run_until_wrap(void)
         }
 #endif
         int seq_state = top->seq_state();
-        if ((seq_state != 0) && (seq_state != 1) && (seq_state != 6)) {
-            printf("Sequencer state: %d rom_addr: 0x%02x 0x%04x 0x%02x 0x%02x\n",
-                seq_state, top->seq_rom_addr(), top->pattern_rom_mem()[top->seq_rom_addr()], top->seq_pattern_addr_nxt, top->seq_pattern_addr);
+        // if ((seq_state != 0) && (seq_state != 1) && (seq_state != 6)) {
+        //     printf("Sequencer state: %d rom_addr: 0x%02x 0x%04x 0x%02x 0x%02x\n",
+        //         seq_state, top->seq_rom_addr(), top->pattern_rom_mem()[top->seq_rom_addr()], top->seq_pattern_addr_nxt, top->seq_pattern_addr);
+        // }
+
+        if (top->o_sample_valid) {
+            printf("Valid: %d note_pitch: 0x%x, note_len: %d, note_instrument: %d, phase: 0x%08X\n",
+                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->o_phase);
+            nop();
         }
+
 #if 0
         if (seq_state == 2) {
             printf("Sequencer state: %d header addr: 0x%x\n",
@@ -114,7 +127,10 @@ void callback(void* userdata, Uint8* stream, int len) {
     len /= sizeof(*snd);
     for( int i = 0; i < len; i++) {
         run_until_wrap();
-        snd[i] = top->o_audio_sample;
+        uint32_t phase = top->o_phase;
+        // printf("Phase: 0x%08X\n", phase);
+        snd[i] = (phase & 0x8000)? 128+16 : 128-16;
+        // snd[i] = top->o_audio_sample;
     }
 }
 

@@ -14,6 +14,7 @@ module channel_test #(
   output wire [3:0]   o_instrument,
 
   output wire         o_sample_valid,
+  output [31:0]       o_phase,
   output wire [8:0]   o_sample
 );
 
@@ -74,6 +75,8 @@ module channel_test #(
     .i_note_stb(w_note_stb),
     .i_tick_stb(w_tick_stb),
 
+    .o_valid(o_sample_valid),
+
     .o_pattern_enable(w_pattern_enable),
     .i_pattern_valid(w_pattern_valid),
 
@@ -86,6 +89,7 @@ module channel_test #(
 
     .o_envelope_enable(w_envelope_enable),
     .o_envelope_load(w_envelope_load)
+    
   );
 
   wire [5:0]  w_pitch;
@@ -105,13 +109,14 @@ module channel_test #(
     .i_rom_data(w_pattern_rom_data)
   );
 
+  wire [31:0] w_phase_delta;
   pitch_lookup pitch_lookup (
     .i_clk(i_clk),
     .i_rst(i_rst),
     .i_enable(w_pitch_lookup_enable),
 
     .i_pitch(w_pitch),
-    .o_phase_delta(),
+    .o_phase_delta(w_phase_delta),
     .o_valid(w_pitch_lookup_valid),
 
     .o_rom_addr(w_note_rom_addr),
@@ -128,9 +133,20 @@ module channel_test #(
     .o_running(w_duration_running)
   );
 
+  wire [31:0] w_phase;
+  phase_generator phase_generator (
+    .i_clk(i_clk),
+    .i_rst(i_rst),
+    .i_phase_delta(w_phase_delta),
+    .i_phase_delta_valid(1'b1),
+    .o_phase(w_phase),
+    .o_phase_strobe()
+  );
+
   assign o_pattern_enable = w_pattern_enable;
   assign o_pitch = w_pitch;
   assign o_duration = w_duration;
   assign o_instrument = w_instrument;
+  assign o_phase = w_phase;
 
 endmodule

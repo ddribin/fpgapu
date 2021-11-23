@@ -38,7 +38,7 @@ TEST_CASE_METHOD(Fixture, "channel: Is not running when initialized", "[channel]
 {
     setupPeriodicPulse(i_tick_stb, 5, 100, 10);
     setupPeriodicPulse(i_note_stb, 5, 100, 20);
-    i_pattern_valid.addInputs({ {7, 1}, {8, 0} });
+    i_pattern_valid.addInputs({ {7, 1}, {8, 0}, {27, 1}, {28, 0} });
     i_pitch_lookup_valid.addInputs({ {9, 1}, {10, 0} });
 
     bench.tick(100);
