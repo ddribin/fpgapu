@@ -24,6 +24,7 @@ using TopModuleBase = Vchannel_test_sdl_top;
 // #define seq_rom_addr SEQVAR(rom_addr)
 #define seq_pattern_addr SEQVAR(pattern_addr)
 #define seq_pattern_addr_nxt SEQVAR(pattern_addr_nxt)
+#define	PITCHVAR(A)   CHTESTVAR(pitch_lookup__DOT__ ## A)
 
 // #define pattern_rom_mem CHTESTVAR(pattern_rom__DOT__memory)
 
@@ -37,6 +38,7 @@ class TopModule : public TopModuleBase {
     CData seq_rom_addr() const { return SEQVAR(rom_addr); }
 
     const SData* pattern_rom_mem() const { return CHTESTVAR(pattern_rom__DOT__memory); }
+    const uint32_t pitch_phase_delta() const { return PITCHVAR(phase_delta); }
 };
 
 // Called by $time in Verilog
@@ -89,8 +91,8 @@ void run_until_wrap(void)
         // }
 
         if (top->o_sample_valid) {
-            printf("Valid: %d note_pitch: 0x%x, note_len: %d, note_instrument: %d, phase: 0x%08X\n",
-                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->o_phase);
+            printf("Valid: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, phase: 0x%08X\n",
+                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta());
             nop();
         }
 
@@ -129,7 +131,7 @@ void callback(void* userdata, Uint8* stream, int len) {
         run_until_wrap();
         uint32_t phase = top->o_phase;
         // printf("Phase: 0x%08X\n", phase);
-        snd[i] = (phase & 0x8000)? 128+16 : 128-16;
+        snd[i] = (phase & 0x80000000)? 128+16 : 128-16;
         // snd[i] = top->o_audio_sample;
     }
 }
