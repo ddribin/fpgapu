@@ -223,18 +223,18 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 3", "[pattern-seq]")
 TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(0x02, 1, 0x01),
+        /* 0x00 */  HEADER(0x02, 1, 0x02),
         /* 0x01 */  PATTERN(0x03, 4),
         /* 0x02 */  PATTERN(0x07, 4),
 
-        /* 0x03 */  NOTE(0x18, 8, 0),
-        /* 0x04 */  NOTE(0x1C, 8, 0),
-        /* 0x05 */  NOTE(0x20, 8, 0),
-        /* 0x06 */  NOTE(0x22, 8, 0),
+        /* 0x03 */  NOTE(0x0C, 8, 0),
+        /* 0x04 */  NOTE(0x0E, 8, 0),
+        /* 0x05 */  NOTE(0x10, 8, 0),
+        /* 0x06 */  NOTE(0x12, 8, 0),
 
-        /* 0x07 */  NOTE(0x18, 8, 0),
-        /* 0x08 */  NOTE(0x18, 8, 0),
-        /* 0x09 */  NOTE(0x18, 8, 0),
+        /* 0x07 */  NOTE(0x13, 8, 0),
+        /* 0x08 */  NOTE(0x15, 8, 0),
+        /* 0x09 */  NOTE(0x17, 8, 0),
         /* 0x0A */  NOTE(0x18, 8, 0),
     };
     memcpy(core.zz_memory, ROM, sizeof(ROM));
