@@ -59,6 +59,8 @@ static const uint64_t COUNTER_MASK = (1ULL << COUNTER_WIDTH) - 1;
 static uint64_t counter;
 static uint64_t callback_delta = 0;
 
+static uint64_t beat_count = 0;
+
 void run_one_tick(void)
 {
     top->i_clk = 1;
@@ -78,25 +80,36 @@ void run_until_wrap(void)
     while (1) {
         run_one_tick();
 
+        if (top->o_beat) {
+            beat_count++;
+        }
+        
 #if 0
         if (top->o_pattern_enable) {
             printf("%lu: Note: %d %d %d\n", context->time(), top->o_pitch, top->o_duration, top->o_instrument);
             printf("Channel State: %d\n", top->chctrl_state);
         }
 #endif
+
+#if 1
+        struct timespec time;
+        clock_gettime(CLOCK_REALTIME, &time);
+
+        if (top->o_sample_valid) {
+            printf("%lld.%.6ld: %4lld: Valid: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, phase: 0x%08X\n",
+                (long long)time.tv_sec, time.tv_nsec/1000, beat_count,
+                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta());
+            nop();
+        }
+#endif
+
+#if 0
         int seq_state = top->seq_state();
         // if ((seq_state != 0) && (seq_state != 1) && (seq_state != 6)) {
         //     printf("Sequencer state: %d rom_addr: 0x%02x 0x%04x 0x%02x 0x%02x\n",
         //         seq_state, top->seq_rom_addr(), top->pattern_rom_mem()[top->seq_rom_addr()], top->seq_pattern_addr_nxt, top->seq_pattern_addr);
         // }
 
-        if (top->o_sample_valid) {
-            printf("Valid: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, phase: 0x%08X\n",
-                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta());
-            nop();
-        }
-
-#if 0
         if (seq_state == 2) {
             printf("Sequencer state: %d header addr: 0x%x\n",
                 seq_state, top->seq_rom_addr);

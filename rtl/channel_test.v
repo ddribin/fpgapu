@@ -8,6 +8,9 @@ module channel_test #(
   input wire          i_clk,
   input wire          i_rst,
 
+  output wire         o_tick,
+  output wire         o_beat,
+
   output wire         o_pattern_enable,
   output wire [5:0]   o_pitch,
   output wire [4:0]   o_duration,
@@ -28,6 +31,8 @@ module channel_test #(
     .o_tick_stb(w_tick_stb),
     .o_beat_stb(w_note_stb)
   );
+  assign o_tick = w_tick_stb;
+  assign o_beat = w_note_stb;
 
   wire [7:0] w_note_rom_addr;
   wire [15:0] w_note_rom_data;

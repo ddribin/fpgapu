@@ -6,6 +6,9 @@ module channel_test_sdl_top #(
   input wire        i_clk,
   input wire        i_rst,
 
+  output wire       o_tick,
+  output wire       o_beat,
+
   output wire         o_pattern_enable,
   output wire [5:0]   o_pitch,
   output wire [4:0]   o_duration,
@@ -32,6 +35,8 @@ module channel_test_sdl_top #(
   ) channel_test (
     .i_clk(i_clk),
     .i_rst(w_rst),
+    .o_tick(o_tick),
+    .o_beat(o_beat),
     .o_pattern_enable(o_pattern_enable),
     .o_pitch(o_pitch),
     .o_duration(o_duration),
