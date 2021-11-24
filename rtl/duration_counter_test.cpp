@@ -10,13 +10,14 @@ using UUT = Vduration_counter;
 struct DurationCounterFixture : TestFixture<UUT>
 {
     Input8 i_rst, i_enable, i_load, i_duration;
-    Output8 o_done;
+    Output8 o_done, o_running;
     DurationCounterFixture() :
         MakeInput(i_rst),
         MakeInput(i_enable),
         MakeInput(i_load),
         MakeInput(i_duration),
-        MakeOutput(o_done)
+        MakeOutput(o_done),
+        MakeOutput(o_running)
     {
     }
 
@@ -48,7 +49,8 @@ TEST_CASE_METHOD(Fixture, "duration: Zero duration", "[duration-counter]")
 
     bench.tick(25);
 
-    CHECK(o_done.changes() == ChangeVector8({{5, 1}, {6, 0}}));
+    CHECK(o_done.changes() == ChangeVector8());
+    CHECK(o_running.changes() == ChangeVector8());
 }
 
 TEST_CASE_METHOD(Fixture, "duration: Runs when loaded", "[duration-counter]")
@@ -59,7 +61,8 @@ TEST_CASE_METHOD(Fixture, "duration: Runs when loaded", "[duration-counter]")
 
     bench.tick(25);
 
-    CHECK(o_done.changes() == ChangeVector8({{7, 1}, {8, 0}}));
+    CHECK(o_done.changes() == ChangeVector8({{6, 1}, {7, 0}}));
+    CHECK(o_running.changes() == ChangeVector8({{5, 1}, {7, 0}}));
 }
 
 TEST_CASE_METHOD(Fixture, "duration: Runs only when enabled", "[duration-counter]")
@@ -70,6 +73,7 @@ TEST_CASE_METHOD(Fixture, "duration: Runs only when enabled", "[duration-counter
     bench.tick(25);
 
     CHECK(o_done.changes() == ChangeVector8());
+    CHECK(o_running.changes() == ChangeVector8());
 }
 
 TEST_CASE_METHOD(Fixture, "duration: Runs when partially enabled", "[duration-counter]")
@@ -80,7 +84,8 @@ TEST_CASE_METHOD(Fixture, "duration: Runs when partially enabled", "[duration-co
 
     bench.tick(25);
 
-    CHECK(o_done.changes() == ChangeVector8({{16, 1}, {17, 0}}));
+    CHECK(o_done.changes() == ChangeVector8({{15, 1}, {16, 0}}));
+    CHECK(o_running.changes() == ChangeVector8({{5, 1}, {16, 0}}));
 }
 
 TEST_CASE_METHOD(Fixture, "duration: Runs when enabled every other clock", "[duration-counter]")
@@ -91,7 +96,8 @@ TEST_CASE_METHOD(Fixture, "duration: Runs when enabled every other clock", "[dur
 
     bench.tick(25);
 
-    CHECK(o_done.changes() == ChangeVector8({{10, 1}, {11, 0}}));
+    CHECK(o_done.changes() == ChangeVector8({{8, 1}, {9, 0}}));
+    CHECK(o_running.changes() == ChangeVector8({{5, 1}, {9, 0}}));
 }
 
 TEST_CASE_METHOD(Fixture, "duration: Not loaded when disabled", "[duration-counter]")
@@ -103,16 +109,18 @@ TEST_CASE_METHOD(Fixture, "duration: Not loaded when disabled", "[duration-count
     bench.tick(25);
 
     CHECK(o_done.changes() == ChangeVector8());
+    CHECK(o_running.changes() == ChangeVector8());
 }
 
 TEST_CASE_METHOD(Fixture, "duration: Reset stops running", "[duration-counter]")
 {
     i_enable.addInputs({{1, 1}});
     i_load.addInputs({{4, 1}, {5, 0}});
-    i_duration.addInputs({{4, 2}, {5, 0}});
+    i_duration.addInputs({{4, 3}, {5, 0}});
     i_rst.addInputs({{6, 1}, {7, 0}});
 
     bench.tick(25);
 
     CHECK(o_done.changes() == ChangeVector8());
+    CHECK(o_running.changes() == ChangeVector8({{5, 1}, {7, 0}}));
 }

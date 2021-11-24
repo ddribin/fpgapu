@@ -30,19 +30,20 @@ module duration_counter (
       STATE_STOPPED: begin
         running = 1'b0;
         if (i_enable && i_load) begin
-          duration_nxt = i_duration;
-          state_nxt = STATE_RUNNING;
+          if (i_duration != 0) begin
+            duration_nxt = i_duration;
+            state_nxt = STATE_RUNNING;
+          end
         end
       end
 
       STATE_RUNNING: begin
         running = 1'b1;
         if (i_enable) begin
-          if (duration == 0) begin
+          duration_nxt = duration - 1;
+          if (duration_nxt == 0) begin
             done = 1'b1;
             state_nxt = STATE_STOPPED;
-          end else begin
-            duration_nxt = duration - 1;
           end
         end
       end

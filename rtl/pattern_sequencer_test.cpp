@@ -223,7 +223,7 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 3", "[pattern-seq]")
 TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(0x02, 1, 0x02),
+        /* 0x00 */  HEADER(0x02, 0, 0x02),
         /* 0x01 */  PATTERN(0x03, 4),
         /* 0x02 */  PATTERN(0x07, 4),
 
@@ -239,7 +239,7 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
     };
     memcpy(core.zz_memory, ROM, sizeof(ROM));
     setupNoteStrobe(250);
-    printf("----\n");
+    printf("---- notes: \n");
     for (int i = 0; i < sizeof(ROM)/sizeof(ROM[0]); i++) {
         printf("%04X\n", ROM[i]);
     }
