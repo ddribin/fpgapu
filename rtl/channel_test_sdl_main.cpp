@@ -25,6 +25,7 @@ using TopModuleBase = Vchannel_test_sdl_top;
 #define seq_pattern_addr SEQVAR(pattern_addr)
 #define seq_pattern_addr_nxt SEQVAR(pattern_addr_nxt)
 #define	PITCHVAR(A)   CHTESTVAR(pitch_lookup__DOT__ ## A)
+#define	DURVAR(A)   CHTESTVAR(duration_counter__DOT__ ## A)
 
 // #define pattern_rom_mem CHTESTVAR(pattern_rom__DOT__memory)
 
@@ -39,6 +40,7 @@ class TopModule : public TopModuleBase {
 
     const SData* pattern_rom_mem() const { return CHTESTVAR(pattern_rom__DOT__memory); }
     const uint32_t pitch_phase_delta() const { return PITCHVAR(phase_delta); }
+    const uint8_t duration_duration() const { return DURVAR(duration); }
 };
 
 // Called by $time in Verilog
@@ -83,7 +85,7 @@ void run_until_wrap(void)
         if (top->o_beat) {
             beat_count++;
         }
-        
+
 #if 0
         if (top->o_pattern_enable) {
             printf("%lu: Note: %d %d %d\n", context->time(), top->o_pitch, top->o_duration, top->o_instrument);
@@ -96,9 +98,9 @@ void run_until_wrap(void)
         clock_gettime(CLOCK_REALTIME, &time);
 
         if (top->o_sample_valid) {
-            printf("%lld.%.6ld: %4lld: Valid: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, phase: 0x%08X\n",
+            printf("%lld.%.6ld: %4lld: Valid: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, phase: 0x%08X, duration: %d\n",
                 (long long)time.tv_sec, time.tv_nsec/1000, beat_count,
-                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta());
+                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta(), top->duration_duration());
             nop();
         }
 #endif

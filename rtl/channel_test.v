@@ -133,7 +133,7 @@ module channel_test #(
     .i_rst(i_rst),
     .i_enable(w_duration_enable),
     .i_load(w_duration_load),
-    .i_duration(0),
+    .i_duration(w_duration),
     .o_done(),
     .o_running(w_duration_running)
   );

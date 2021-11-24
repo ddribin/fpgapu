@@ -227,18 +227,23 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
         /* 0x01 */  PATTERN(0x03, 4),
         /* 0x02 */  PATTERN(0x07, 4),
 
-        /* 0x03 */  NOTE(0x0C, 8, 0),
-        /* 0x04 */  NOTE(0x0E, 8, 0),
-        /* 0x05 */  NOTE(0x10, 8, 0),
-        /* 0x06 */  NOTE(0x12, 8, 0),
+        /* 0x03 */  NOTE(0x0C, 3, 0),
+        /* 0x04 */  NOTE(0x0E, 3, 0),
+        /* 0x05 */  NOTE(0x10, 3, 0),
+        /* 0x06 */  NOTE(0x11, 7, 0),
 
-        /* 0x07 */  NOTE(0x13, 8, 0),
-        /* 0x08 */  NOTE(0x15, 8, 0),
-        /* 0x09 */  NOTE(0x17, 8, 0),
-        /* 0x0A */  NOTE(0x18, 8, 0),
+        /* 0x07 */  NOTE(0x13, 3, 0),
+        /* 0x08 */  NOTE(0x15, 3, 0),
+        /* 0x09 */  NOTE(0x17, 3, 0),
+        /* 0x0A */  NOTE(0x18, 7, 0),
     };
     memcpy(core.zz_memory, ROM, sizeof(ROM));
     setupNoteStrobe(250);
+    printf("----\n");
+    for (int i = 0; i < sizeof(ROM)/sizeof(ROM[0]); i++) {
+        printf("%04X\n", ROM[i]);
+    }
+    printf("----\n");
 
     bench.tick(250);
 }

@@ -76,20 +76,19 @@ module channel_controller (
     case (state)
       STATE_START_NOTE: begin
         if (i_tick_stb && i_note_stb) begin
-          state_nxt = STATE_ENABLE_PATTERN;
+          if (i_duration_running) begin
+            state_nxt = STATE_CONTINUE_NOTE;
+          end else begin
+            state_nxt = STATE_ENABLE_PATTERN;
+          end
         end
       end
 
       STATE_CONTINUE_NOTE: begin
-        if (i_tick_stb && i_note_stb) begin
-          if (i_duration_running) begin
-            state_nxt = STATE_START_NOTE;
-          end else begin
-            state_nxt = STATE_START_NOTE;
-          end
-        end else if (i_tick_stb && !i_note_stb) begin
-
-        end
+        duration_enable = 1'b1;
+        // state_nxt = STATE_CONTINUE_NOTE;
+        state_nxt = STATE_VALID;
+        valid_nxt = 1'b1;
       end
 
       STATE_ADVANCE_TICK: begin
@@ -114,16 +113,16 @@ module channel_controller (
 
       STATE_WAIT_PITCH_LOOKUP: begin
         if (i_pitch_lookup_valid) begin
-          // state_nxt = STATE_LOAD_DURATION;
-          state_nxt = STATE_VALID;
-          valid_nxt = 1'b1;
+          state_nxt = STATE_LOAD_DURATION;
         end
       end
 
       STATE_LOAD_DURATION: begin
         duration_enable = 1'b1;
         duration_load = 1'b1;
-        state_nxt = STATE_CONTINUE_NOTE;
+        // state_nxt = STATE_CONTINUE_NOTE;
+        state_nxt = STATE_VALID;
+        valid_nxt = 1'b1;
       end
 
       STATE_ENABLE_DURATION: begin
