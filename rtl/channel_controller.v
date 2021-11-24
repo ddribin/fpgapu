@@ -51,6 +51,7 @@ module channel_controller (
   localparam STATE_CONTINUE_NOTE        = 4'd1;
 
   localparam STATE_WIDTH = 4;
+  
   reg [STATE_WIDTH-1:0]   state, state_nxt;
 
   reg valid, valid_nxt;
@@ -144,11 +145,15 @@ module channel_controller (
   always @(posedge i_clk) begin
     if (i_rst) begin
       state <= STATE_START_NOTE;
-      valid <= 1'b0;
+      // valid <= 1'b0;
     end else begin
       state <= state_nxt;
-      valid <= valid_nxt;
+      // valid <= valid_nxt;
     end
+  end
+
+  always @(posedge i_clk) begin
+    valid <= (state_nxt == STATE_VALID);
   end
 
   assign o_valid = valid;
