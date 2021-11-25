@@ -41,6 +41,8 @@ class TopModule : public TopModuleBase {
     const SData* pattern_rom_mem() const { return CHTESTVAR(pattern_rom__DOT__memory); }
     const uint32_t pitch_phase_delta() const { return PITCHVAR(phase_delta); }
     const uint8_t duration_duration() const { return DURVAR(duration); }
+    const uint32_t r_phase_delta() const { return CHTESTVAR(r_phase_delta); }
+    const uint32_t r_phase_delta_nxt() const { return CHTESTVAR(r_phase_delta_nxt); }
 };
 
 // Called by $time in Verilog
@@ -93,14 +95,16 @@ void run_until_wrap(void)
         }
 #endif
 
-#if 1
+#if 0
         struct timespec time;
         clock_gettime(CLOCK_REALTIME, &time);
 
-        if (top->o_sample_valid) {
-            printf("%lld.%.6ld: %4lld: Valid: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, phase: 0x%08X, duration: %d\n",
+        // if (true) {
+        if ((top->o_sample_valid) || (top->o_tick)) {
+            printf("%lld.%.6ld: %4lld: tick: %d, beat: %d, valid: %d, state: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, delta: 0x%08X, r_delta: 0x%08x, r_delta_nxt: 0x%08X, phase: 0x%08X, duration: %d, sample: %d\n",
                 (long long)time.tv_sec, time.tv_nsec/1000, beat_count,
-                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta(), top->duration_duration());
+                top->o_tick, top->o_beat, top->o_sample_valid,
+                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta(), top->r_phase_delta(), top->r_phase_delta_nxt(), top->o_phase, top->duration_duration(), top->o_audio_sample);
             nop();
         }
 #endif
@@ -145,8 +149,10 @@ void callback(void* userdata, Uint8* stream, int len) {
     for( int i = 0; i < len; i++) {
         run_until_wrap();
         uint32_t phase = top->o_phase;
-        // printf("Phase: 0x%08X\n", phase);
-        snd[i] = (phase & 0x80000000)? 128+16 : 128-16;
+        // uint8_t sample_calc = (phase & 0x80000000)? 128+16 : 128-16;
+        uint8_t sample_calc = (phase & 0x80000000)? 16 : 0;
+        // printf("Phase: 0x%08X, sample_calc: %d, sample: %d\n", phase, sample_calc, top->o_audio_sample);
+        snd[i] = top->o_audio_sample;
         // snd[i] = top->o_audio_sample;
     }
 }

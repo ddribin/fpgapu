@@ -138,11 +138,27 @@ module channel_test #(
     .o_running(w_duration_running)
   );
 
+  reg [31:0]  r_phase_delta;
+  reg [31:0]  r_phase_delta_nxt;
+  always @(posedge i_clk) begin
+    if (i_rst) begin
+      r_phase_delta <= '0;
+      r_phase_delta_nxt <= '0;
+    end else begin
+      if (o_tick) begin
+        r_phase_delta <= r_phase_delta_nxt;
+      end
+      if (o_sample_valid) begin
+        r_phase_delta_nxt <= w_phase_delta;
+      end
+    end
+  end
+
   wire [31:0] w_phase;
   phase_generator phase_generator (
     .i_clk(i_clk),
     .i_rst(i_rst),
-    .i_phase_delta(w_phase_delta),
+    .i_phase_delta(r_phase_delta),
     .i_phase_delta_valid(1'b1),
     .o_phase(w_phase),
     .o_phase_strobe()
@@ -153,5 +169,6 @@ module channel_test #(
   assign o_duration = w_duration;
   assign o_instrument = w_instrument;
   assign o_phase = w_phase;
+  assign o_sample = (w_phase[31] == 1'b1)? 9'd16 : 9'd0;
 
 endmodule
