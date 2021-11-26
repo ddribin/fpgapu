@@ -12,6 +12,7 @@ verilate(${LIB_TARGET_NAME} SOURCES note_sequencer_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES pattern_sequencer_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES note_player_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES duration_counter.v TRACE)
+verilate(${LIB_TARGET_NAME} SOURCES envelope_generator_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES pitch_lookup_tb.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES channel_controller.v TRACE)
 verilate(${LIB_TARGET_NAME} SOURCES rom_sync_fake.v TRACE
@@ -43,6 +44,7 @@ add_executable(${TEST_TARGET_NAME}
     pattern_sequencer_test.cpp
     note_player_test.cpp
     duration_counter_test.cpp
+    envelope_generator_test.cpp
     pitch_lookup_test.cpp
     channel_controller_test.cpp
     rom_sync_fake_test.cpp

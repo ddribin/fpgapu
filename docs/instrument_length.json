@@ -1,0 +1,27 @@
+{
+    "config": {
+        "bits": 16
+    },
+    "reg": [
+        {
+            "bits": 4,
+            "type": 2,
+            "name": "length 0"
+        },
+        {
+            "bits": 4,
+            "type": 3,
+            "name": "length 1"
+        },
+        {
+            "bits": 4,
+            "type": 4,
+            "name": "length 2"
+        },
+        {
+            "bits": 4,
+            "type": 5,
+            "name": "length 3"
+        }
+    ]
+}
