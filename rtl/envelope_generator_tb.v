@@ -35,6 +35,6 @@ module envelope_generator_tb #(
     .memory(zz_memory)
   );
 
-  envelope_generator uut (.*);
+  envelope_generator #(.BASE_ADDRESS(8'h10)) uut (.*);
 
 endmodule

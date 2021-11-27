@@ -98,6 +98,7 @@ module channel_controller (
       end
 
       STATE_ADVANCE_ENVELOPE: begin
+        rom_source_nxt = 2'b10;
         envelope_enable = 1'b1;
         state_nxt = STATE_WAIT_ENVELOPE;
       end

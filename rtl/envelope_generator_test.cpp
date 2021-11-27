@@ -22,6 +22,13 @@ struct EnvelopeGeneratorFixture : TestFixture<UUT>
     {
     }
 
+    void copyToROM(const void *data, size_t len, uint8_t offset = 0x00)
+    {
+        static const uint8_t BASE = 0x10;
+        memcpy(core.zz_memory + BASE + offset, data, len);
+    }
+
+
     void setupStrobe(uint64_t endTime)
     {
         uint64_t time = 10;
@@ -53,7 +60,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument length 1", "[envelope-generator]
         /* 0x06 */  ENVELOPES(0,  0,  0,  0),
         /* 0x07 */  ENVELOPES(0,  0,  0,  0),
     };
-    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    copyToROM(ROM, sizeof(ROM));
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0} });
     i_instrument.addInputs({ {10, 0} });
@@ -84,7 +91,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument length 2", "[envelope-generator]
         /* 0x06 */  ENVELOPES(0,  0,  0,  0),
         /* 0x07 */  ENVELOPES(0,  0,  0,  0),
     };
-    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    copyToROM(ROM, sizeof(ROM));
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0} });
     i_instrument.addInputs({ {10, 0} });
@@ -115,7 +122,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument length 4", "[envelope-generator]
         /* 0x06 */  ENVELOPES(0,  0,  0,  0),
         /* 0x07 */  ENVELOPES(0,  0,  0,  0),
     };
-    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    copyToROM(ROM, sizeof(ROM));
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0} });
     i_instrument.addInputs({ {10, 0} });
@@ -154,7 +161,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument 1 length 4", "[envelope-generato
         /* 0x0A */  ENVELOPES(0,  0,  0,  0),
         /* 0x0B */  ENVELOPES(0,  0,  0,  0),
     };
-    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    copyToROM(ROM, sizeof(ROM));
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0} });
     i_instrument.addInputs({ {10, 1} });
@@ -181,7 +188,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument F length 4", "[envelope-generato
         /* 0x02 */  LENGTHS(0,  0,  0,  0),
         /* 0x03 */  LENGTHS(0,  0,  0,  3),
     };
-    memcpy(core.zz_memory, LENGTHS, sizeof(LENGTHS));
+    copyToROM(LENGTHS, sizeof(LENGTHS));
 
     static uint16_t ENVELOPES[] = {
         // Instrument F Envelopes
@@ -190,7 +197,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument F length 4", "[envelope-generato
         /* 0x42 */  ENVELOPES(0,  0,  0,  0),
         /* 0x43 */  ENVELOPES(0,  0,  0,  0),
     };
-    memcpy(core.zz_memory + 0x40, ENVELOPES, sizeof(ENVELOPES));
+    copyToROM(ENVELOPES, sizeof(ENVELOPES), 0x40);
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0} });
     i_instrument.addInputs({ {10, 0xF} });
@@ -217,7 +224,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument F length 15", "[envelope-generat
         /* 0x02 */  LENGTHS(0,  0,  0,  0),
         /* 0x03 */  LENGTHS(0,  0,  0,  15),
     };
-    memcpy(core.zz_memory, LENGTHS, sizeof(LENGTHS));
+    copyToROM(LENGTHS, sizeof(LENGTHS));
 
     static uint16_t ENVELOPES[] = {
         // Instrument F Envelopes
@@ -226,7 +233,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument F length 15", "[envelope-generat
         /* 0x42 */  ENVELOPES( 9, 10, 11, 12),
         /* 0x43 */  ENVELOPES(13, 14, 15,  0),
     };
-    memcpy(core.zz_memory + 0x40, ENVELOPES, sizeof(ENVELOPES));
+    copyToROM(ENVELOPES, sizeof(ENVELOPES), 0x40);
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0} });
     i_instrument.addInputs({ {10, 0xF} });
@@ -285,7 +292,7 @@ TEST_CASE_METHOD(Fixture, "envelope: instrument 1 then 0", "[envelope-generator]
         /* 0x0A */  ENVELOPES(0,  0,  0,  0),
         /* 0x0B */  ENVELOPES(0,  0,  0,  0),
     };
-    memcpy(core.zz_memory, ROM, sizeof(ROM));
+    copyToROM(ROM, sizeof(ROM));
 
     i_load_instrument.addInputs({ {10, 1}, {11, 0}, {40, 1}, {41, 0} });
     i_instrument.addInputs({ {10, 1}, {40, 0} });

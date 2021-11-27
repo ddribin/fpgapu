@@ -160,18 +160,22 @@ module channel_test #(
     .i_rom_data(w_pattern_rom_data)
   );
 
-  reg [31:0]  r_phase_delta;
-  reg [31:0]  r_phase_delta_nxt;
+  reg [31:0]  r_phase_delta, r_phase_delta_nxt;
+  reg [3:0]   r_amplitude, r_amplitude_nxt;
   always @(posedge i_clk) begin
     if (i_rst) begin
-      r_phase_delta <= '0;
-      r_phase_delta_nxt <= '0;
+      r_phase_delta <= 0;
+      r_phase_delta_nxt <= 0;
+      r_amplitude <= 0;
+      r_amplitude_nxt <= 0;
     end else begin
       if (o_tick) begin
         r_phase_delta <= r_phase_delta_nxt;
+        r_amplitude <= r_amplitude_nxt;
       end
       if (o_sample_valid) begin
         r_phase_delta_nxt <= w_phase_delta;
+        r_amplitude_nxt <= w_amplitude;
       end
     end
   end
@@ -201,6 +205,7 @@ module channel_test #(
   assign o_duration = w_duration;
   assign o_instrument = w_instrument;
   assign o_phase = w_phase;
-  assign o_sample = (w_phase[31] == 1'b1)? {5'd0, w_amplitude} : 9'd0;
+  assign o_sample = (w_phase[31] == 1'b1)? {5'd0, r_amplitude} : 9'd0;
+  // assign o_sample = (w_phase[31] == 1'b1)? {5'd0, 4'd15} : 9'd0;
 
 endmodule

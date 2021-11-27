@@ -26,6 +26,7 @@ using TopModuleBase = Vchannel_test_sdl_top;
 #define seq_pattern_addr_nxt SEQVAR(pattern_addr_nxt)
 #define	PITCHVAR(A)   CHTESTVAR(pitch_lookup__DOT__ ## A)
 #define	DURVAR(A)   CHTESTVAR(duration_counter__DOT__ ## A)
+#define	ENVVAR(A)   CHTESTVAR(envelope_generator__DOT__ ## A)
 
 // #define pattern_rom_mem CHTESTVAR(pattern_rom__DOT__memory)
 
@@ -43,6 +44,8 @@ class TopModule : public TopModuleBase {
     const uint8_t duration_duration() const { return DURVAR(duration); }
     const uint32_t r_phase_delta() const { return CHTESTVAR(r_phase_delta); }
     const uint32_t r_phase_delta_nxt() const { return CHTESTVAR(r_phase_delta_nxt); }
+    const uint8_t r_amplitude() const { return CHTESTVAR(r_amplitude); }
+    const uint8_t env_state() const { return ENVVAR(state); }
 };
 
 // Called by $time in Verilog
@@ -97,20 +100,30 @@ void run_until_wrap(void)
         }
 #endif
 
-#if 1
+#if 0
         struct timespec time;
         clock_gettime(CLOCK_REALTIME, &time);
 
         // if (true) {
         if ((top->o_sample_valid) || (top->o_tick)) {
-            printf("%8lld: %4lld.%lld: tick: %d, beat: %d, valid: %d, state: %-2d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, delta: 0x%08X, r_delta: 0x%08x, r_delta_nxt: 0x%08X, phase: 0x%08X, duration: %d, sample: %d\n",
+            printf("%8lld: %4lld.%lld: tick: %d, beat: %d, valid: %d, state: %-2d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, amp: %d, delta: 0x%08X, r_delta: 0x%08x, r_delta_nxt: 0x%08X, phase: 0x%08X, duration: %d, sample: %d\n",
                 // (long long)time.tv_sec, time.tv_nsec/1000,
                 clock_count,
                 tick_count, beat_count,
                 top->o_tick, top->o_beat, top->o_sample_valid,
-                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta(), top->r_phase_delta(), top->r_phase_delta_nxt(), top->o_phase, top->duration_duration(), top->o_audio_sample);
+                top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->r_amplitude(), top->pitch_phase_delta(), top->r_phase_delta(), top->r_phase_delta_nxt(), top->o_phase, top->duration_duration(), top->o_audio_sample);
+            if (top->o_sample_valid) {
+            nop();
+            }
+        }
+
+#if 0
+        if ((top->env_state() != 0)) {
+            printf("%8lld: %4lld.%lld: state: %-2d amp: %d\n",
+                clock_count, tick_count, beat_count, top->env_state(), top->r_amplitude());
             nop();
         }
+#endif
 #endif
 
 #if 0
@@ -155,7 +168,11 @@ void callback(void* userdata, Uint8* stream, int len) {
         uint32_t phase = top->o_phase;
         // uint8_t sample_calc = (phase & 0x80000000)? 128+16 : 128-16;
         uint8_t sample_calc = (phase & 0x80000000)? 16 : 0;
-        // printf("Phase: 0x%08X, sample_calc: %d, sample: %d\n", phase, sample_calc, top->o_audio_sample);
+#if 0
+        printf("%8lld: %4lld.%lld: Phase: 0x%08X, sample_calc: %d, sample: %d\n",
+            clock_count, tick_count, beat_count,
+            phase, sample_calc, top->o_audio_sample);
+#endif
         snd[i] = top->o_audio_sample;
         // snd[i] = top->o_audio_sample;
     }

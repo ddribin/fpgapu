@@ -235,10 +235,10 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
         /* 0x05 */  NOTE(0x10, 3, 0),
         /* 0x06 */  NOTE(0x11, 7, 0),
 
-        /* 0x07 */  NOTE(0x13, 3, 0),
-        /* 0x08 */  NOTE(0x15, 3, 0),
-        /* 0x09 */  NOTE(0x17, 3, 0),
-        /* 0x0A */  NOTE(0x18, 7, 0),
+        /* 0x07 */  NOTE(0x13, 3, 1),
+        /* 0x08 */  NOTE(0x15, 3, 1),
+        /* 0x09 */  NOTE(0x17, 3, 1),
+        /* 0x0A */  NOTE(0x18, 7, 1),
 
         /* 0x0B */  0x00,
         /* 0x0C */  0x00,
@@ -247,28 +247,28 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
         /* 0x0F */  0x00,
 
         // Instrument Lengths
-        /* 0x10 */  LENGTHS(2,  3,  0,  0),
+        /* 0x10 */  LENGTHS(8, 15,  0,  0),
         /* 0x11 */  LENGTHS(0,  0,  0,  0),
         /* 0x12 */  LENGTHS(0,  0,  0,  0),
         /* 0x13 */  LENGTHS(0,  0,  0,  0),
 
         // Instrument 0 Envelopes
-        /* 0x14 */  ENVELOPES(12, 13, 14,  15),
-        /* 0x15 */  ENVELOPES( 0,  0,  0,   0),
+        /* 0x14 */  ENVELOPES( 3,  3,  7,   7),
+        /* 0x15 */  ENVELOPES(11, 11, 15,  15),
         /* 0x16 */  ENVELOPES( 0,  0,  0,   0),
         /* 0x17 */  ENVELOPES( 0,  0,  0,   0),
 
         // Instrument 1 Envelopes
-        /* 0x18 */  ENVELOPES( 8,  9, 10,  11),
-        /* 0x19 */  ENVELOPES( 0,  0,  0,   0),
-        /* 0x1A */  ENVELOPES( 0,  0,  0,   0),
-        /* 0x1B */  ENVELOPES( 0,  0,  0,   0),
+        /* 0x18 */  ENVELOPES(15, 15,  15, 15),
+        /* 0x19 */  ENVELOPES(11, 11,  11, 11),
+        /* 0x1A */  ENVELOPES( 7,  7,  7,   7),
+        /* 0x1B */  ENVELOPES( 3,  3,  3,   3),
     };
     memcpy(core.zz_memory, ROM, sizeof(ROM));
     setupNoteStrobe(250);
     printf("---- notes: \n");
     for (int i = 0; i < sizeof(ROM)/sizeof(ROM[0]); i++) {
-        printf("%04X\n", ROM[i]);
+        printf("%04X // 0x%02X\n", ROM[i], i);
     }
     printf("----\n");
 
