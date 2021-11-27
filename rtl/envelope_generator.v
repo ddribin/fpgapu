@@ -59,9 +59,9 @@ module envelope_generator #(
   reg         valid, valid_nxt;
 
   always @(*) begin
-    state_nxt = state;
-
     rom_addr = 8'd0;
+
+    state_nxt = state;
 
     instrument_nxt = instrument;
     instrument_length_nxt = instrument_length;
@@ -114,18 +114,24 @@ module envelope_generator #(
   always @(posedge i_clk) begin
     if (i_rst) begin
       state <= STATE_START;
+
       instrument <= 0;
       instrument_length <= 0;
-      amplitude <= 0;
+
+      envelope_index <= 0;
+
       valid <= 0;
+      amplitude <= 0;
     end else begin
       state <= state_nxt;
 
       instrument <= instrument_nxt;
       instrument_length <= instrument_length_nxt;
-      amplitude <= amplitude_nxt;
+
       envelope_index <= envelope_index_nxt;
+
       valid <= valid_nxt;
+      amplitude <= amplitude_nxt;
     end
   end
 
