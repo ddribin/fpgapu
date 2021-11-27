@@ -22,15 +22,6 @@ module envelope_generator #(
   localparam LENGTHS_BASE_ADDRESS = BASE_ADDRESS;
   localparam ENVELOPES_BASE_ADDRESS = BASE_ADDRESS + 8'h4;
 
-  reg [3:0]   r_instrument = 0;
-  always @(posedge i_clk) begin
-    if (i_rst) begin
-      r_instrument <= 0;
-    end else if (i_load_instrument) begin
-      r_instrument <= i_instrument;
-    end
-  end
-
   localparam STATE_START                = 3'd0;
   localparam STATE_OUTPUT_LENGTH_ADDR   = 3'd1;
   localparam STATE_READ_LENGTH_DATA     = 3'd2;
@@ -74,8 +65,13 @@ module envelope_generator #(
     case (state)
       STATE_START: begin
         if (i_strobe) begin
-          state_nxt = STATE_OUTPUT_LENGTH_ADDR;
-          instrument_nxt = r_instrument;
+          if (i_load_instrument) begin
+            instrument_nxt = i_instrument;
+            envelope_index_nxt = 4'd0;
+            state_nxt = STATE_OUTPUT_LENGTH_ADDR;
+          end else begin
+            state_nxt = STATE_OUTPUT_ENVELOPE_ADDR;
+          end
         end
       end
 
@@ -90,14 +86,17 @@ module envelope_generator #(
       end
 
       STATE_OUTPUT_ENVELOPE_ADDR: begin
-        rom_addr = ENVELOPES_BASE_ADDRESS + {6'b0, instrument[3:2]};
+        rom_addr = ENVELOPES_BASE_ADDRESS + ({4'b0, instrument} << 2) + {6'b0, envelope_index[3:2]};
         state_nxt = STATE_READ_ENVELOPE_DATA;
       end
 
       STATE_READ_ENVELOPE_DATA: begin
-        amplitude_nxt = rom_data_fields[instrument[1:0]];
+        amplitude_nxt = rom_data_fields[envelope_index[1:0]];
         valid_nxt = 1'b1;
         state_nxt = STATE_OUTPUT_VALID;
+        if (envelope_index < instrument_length) begin
+          envelope_index_nxt = envelope_index + 1;
+        end
       end
 
       STATE_OUTPUT_VALID: begin
