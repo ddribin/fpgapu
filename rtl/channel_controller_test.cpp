@@ -10,13 +10,14 @@ using UUT = Vchannel_controller;
 struct ChannelControllerFixture : TestFixture<UUT>
 {
     Input8 i_rst, i_tick_stb, i_note_stb;
-    Input8 i_pattern_valid, i_pitch_lookup_valid;
+    Input8 i_pattern_valid, i_pitch_lookup_valid, i_envelope_valid;
     ChannelControllerFixture() :
         MakeInput(i_rst),
         MakeInput(i_tick_stb),
         MakeInput(i_note_stb),
         MakeInput(i_pattern_valid),
-        MakeInput(i_pitch_lookup_valid)
+        MakeInput(i_pitch_lookup_valid),
+        MakeInput(i_envelope_valid)
     {
     }
 
@@ -40,6 +41,7 @@ TEST_CASE_METHOD(Fixture, "channel: Is not running when initialized", "[channel]
     setupPeriodicPulse(i_note_stb, 5, 100, 20);
     i_pattern_valid.addInputs({ {7, 1}, {8, 0}, {27, 1}, {28, 0} });
     i_pitch_lookup_valid.addInputs({ {9, 1}, {10, 0} });
+    i_envelope_valid.addInputs({ {12, 1}, {13, 0}, {17, 1}, {18, 0} });
 
     bench.tick(100);
 }

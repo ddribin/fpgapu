@@ -63,6 +63,8 @@ static const uint64_t COUNTER_MASK = (1ULL << COUNTER_WIDTH) - 1;
 static uint64_t counter;
 static uint64_t callback_delta = 0;
 
+static uint64_t clock_count = 0;
+static uint64_t tick_count = 0;
 static uint64_t beat_count = 0;
 
 void run_one_tick(void)
@@ -84,9 +86,9 @@ void run_until_wrap(void)
     while (1) {
         run_one_tick();
 
-        if (top->o_beat) {
-            beat_count++;
-        }
+        clock_count += 1;
+        tick_count  += top->o_tick;
+        beat_count  += top->o_beat;
 
 #if 0
         if (top->o_pattern_enable) {
@@ -95,14 +97,16 @@ void run_until_wrap(void)
         }
 #endif
 
-#if 0
+#if 1
         struct timespec time;
         clock_gettime(CLOCK_REALTIME, &time);
 
         // if (true) {
         if ((top->o_sample_valid) || (top->o_tick)) {
-            printf("%lld.%.6ld: %4lld: tick: %d, beat: %d, valid: %d, state: %d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, delta: 0x%08X, r_delta: 0x%08x, r_delta_nxt: 0x%08X, phase: 0x%08X, duration: %d, sample: %d\n",
-                (long long)time.tv_sec, time.tv_nsec/1000, beat_count,
+            printf("%8lld: %4lld.%lld: tick: %d, beat: %d, valid: %d, state: %-2d note_pitch: 0x%02x, note_len: %d, note_instrument: %d, delta: 0x%08X, r_delta: 0x%08x, r_delta_nxt: 0x%08X, phase: 0x%08X, duration: %d, sample: %d\n",
+                // (long long)time.tv_sec, time.tv_nsec/1000,
+                clock_count,
+                tick_count, beat_count,
                 top->o_tick, top->o_beat, top->o_sample_valid,
                 top->chctrl_state(), top->seq_note_pitch, top->seq_note_len, top->seq_note_instrument, top->pitch_phase_delta(), top->r_phase_delta(), top->r_phase_delta_nxt(), top->o_phase, top->duration_duration(), top->o_audio_sample);
             nop();

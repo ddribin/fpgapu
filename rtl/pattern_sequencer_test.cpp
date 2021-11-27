@@ -220,10 +220,13 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 3", "[pattern-seq]")
 }
 
 
+#define LENGTHS(LEN0, LEN1, LEN2, LEN3) ((LEN3 << 12) | (LEN2 << 8) | (LEN1 << 4) | LEN0)
+#define ENVELOPES(ENV0, ENV1, ENV2, ENV3) ((ENV3 << 12) | (ENV2 << 8) | (ENV1 << 4) | ENV0)
+
 TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
 {
     static uint16_t ROM[] = {
-        /* 0x00 */  HEADER(0x02, 0, 0x02),
+        /* 0x00 */  HEADER(0x02, 1, 0x02),
         /* 0x01 */  PATTERN(0x03, 4),
         /* 0x02 */  PATTERN(0x07, 4),
 
@@ -236,6 +239,30 @@ TEST_CASE_METHOD(Fixture, "pattern: Scale song 4", "[pattern-seq]")
         /* 0x08 */  NOTE(0x15, 3, 0),
         /* 0x09 */  NOTE(0x17, 3, 0),
         /* 0x0A */  NOTE(0x18, 7, 0),
+
+        /* 0x0B */  0x00,
+        /* 0x0C */  0x00,
+        /* 0x0D */  0x00,
+        /* 0x0E */  0x00,
+        /* 0x0F */  0x00,
+
+        // Instrument Lengths
+        /* 0x10 */  LENGTHS(2,  3,  0,  0),
+        /* 0x11 */  LENGTHS(0,  0,  0,  0),
+        /* 0x12 */  LENGTHS(0,  0,  0,  0),
+        /* 0x13 */  LENGTHS(0,  0,  0,  0),
+
+        // Instrument 0 Envelopes
+        /* 0x14 */  ENVELOPES(12, 13, 14,  15),
+        /* 0x15 */  ENVELOPES( 0,  0,  0,   0),
+        /* 0x16 */  ENVELOPES( 0,  0,  0,   0),
+        /* 0x17 */  ENVELOPES( 0,  0,  0,   0),
+
+        // Instrument 1 Envelopes
+        /* 0x18 */  ENVELOPES( 8,  9, 10,  11),
+        /* 0x19 */  ENVELOPES( 0,  0,  0,   0),
+        /* 0x1A */  ENVELOPES( 0,  0,  0,   0),
+        /* 0x1B */  ENVELOPES( 0,  0,  0,   0),
     };
     memcpy(core.zz_memory, ROM, sizeof(ROM));
     setupNoteStrobe(250);
